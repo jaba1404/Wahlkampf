@@ -6,15 +6,15 @@ import java.util.Random;
 
 public class Math {
     public int clampInt(int num, int min, int max) {
-        return num < min ? min : (num > max ? max : num);
+        return num < min ? min : (java.lang.Math.min(num, max));
     }
 
     public float clampFloat(float num, float min, float max) {
-        return num < min ? min : (num > max ? max : num);
+        return num < min ? min : (java.lang.Math.min(num, max));
     }
 
     public double clampDouble(double num, double min, double max) {
-        return num < min ? min : (num > max ? max : num);
+        return num < min ? min : (java.lang.Math.min(num, max));
     }
 
     public int getRandomInt(int min, int max) {

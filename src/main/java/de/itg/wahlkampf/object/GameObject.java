@@ -6,14 +6,17 @@ import java.awt.event.KeyEvent;
 public abstract class GameObject {
     private String name;
     private Type type;
-    private int positionX, positionY;
+    private int positionX, positionY, width, height;
 
-    public GameObject(String name, Type type, int positionX, int positionY) {
+    public GameObject(String name, Type type, int positionX, int positionY, int width, int height) {
         this.name = name;
         this.type = type;
         this.positionX = positionX;
         this.positionY = positionY;
+        this.width = width;
+        this.height = height;
     }
+
     public abstract void onRender(Graphics graphics);
 
     public abstract void onTick();
@@ -52,5 +55,21 @@ public abstract class GameObject {
 
     public void setPositionY(int positionY) {
         this.positionY = positionY;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 }
