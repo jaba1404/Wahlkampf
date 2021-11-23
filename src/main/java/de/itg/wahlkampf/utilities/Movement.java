@@ -1,11 +1,11 @@
 package de.itg.wahlkampf.utilities;
 
-import de.itg.wahlkampf.object.GameObject;
+import de.itg.wahlkampf.object.AbstractGameObject;
 
 public class Movement {
     public static final int SPEED = 5;
 
-    public void move(GameObject object, Direction direction) {
+    public void move(AbstractGameObject object, Direction direction) {
         switch (direction) {
             case UP -> object.setPositionY(object.getPositionY() - SPEED);
             case DOWN -> object.setPositionY(object.getPositionY() + SPEED);
@@ -14,11 +14,12 @@ public class Movement {
         }
     }
 
-    public void jump(GameObject object, int height) {
+    public void jump(AbstractGameObject object, int height) {
         object.setPositionY(object.getPositionY() - height);
     }
 
-    public void fall(GameObject gameObject, float multiplier) {
+    public void fall(AbstractGameObject gameObject, float multiplier) {
         gameObject.setPositionY((int) ((gameObject.getPositionY() + SPEED) * multiplier));
     }
+
 }

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ParticleHandler {
-    private final List<Particle> particleList = new ArrayList<>();
+    private final List<AbstractParticle> particleList = new ArrayList<>();
 
     public void bloomEffect(int x, int y, int size, Color color, ParticleType particleType, int spread, int degreeFrom, int degreeTo, int travelDistance) {
         for (int i = degreeFrom; i < degreeTo; i++) {
@@ -24,7 +24,7 @@ public class ParticleHandler {
         }
         if (!particleList.isEmpty()) {
             for (int i = 0; i < particleList.size(); i++) {
-                Particle particle = particleList.get(i);
+                AbstractParticle particle = particleList.get(i);
                 if (particle.getTimeHelper().hasPassed(time)) {
                     particleList.remove(particle);
                 }
@@ -40,7 +40,7 @@ public class ParticleHandler {
         }
     }
 
-    public List<Particle> getParticleList() {
+    public List<AbstractParticle> getParticleList() {
         return particleList;
     }
 }

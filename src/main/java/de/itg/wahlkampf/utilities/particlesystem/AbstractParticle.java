@@ -5,7 +5,7 @@ import de.itg.wahlkampf.utilities.TimeHelper;
 
 import java.awt.*;
 
-public abstract class Particle {
+public abstract class AbstractParticle {
     private int x, y, size;
     private Color color;
     private ParticleType particleType;
@@ -13,7 +13,7 @@ public abstract class Particle {
     private TimeHelper timeHelper;
 
 
-    public Particle(int x, int y, int size, Color color, ParticleType particleType) {
+    public AbstractParticle(int x, int y, int size, Color color, ParticleType particleType) {
         timeHelper = new TimeHelper();
         this.x = x;
         this.y = y;

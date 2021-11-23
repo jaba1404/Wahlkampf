@@ -3,12 +3,12 @@ package de.itg.wahlkampf.object;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-public abstract class GameObject {
+public abstract class AbstractGameObject {
     private String name;
     private Type type;
     private int positionX, positionY, width, height;
 
-    public GameObject(String name, Type type, int positionX, int positionY, int width, int height) {
+    public AbstractGameObject(String name, Type type, int positionX, int positionY, int width, int height) {
         this.name = name;
         this.type = type;
         this.positionX = positionX;

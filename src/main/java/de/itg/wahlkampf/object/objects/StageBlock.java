@@ -1,13 +1,13 @@
 package de.itg.wahlkampf.object.objects;
 
 import de.itg.wahlkampf.Wrapper;
-import de.itg.wahlkampf.object.GameObject;
+import de.itg.wahlkampf.object.AbstractGameObject;
 import de.itg.wahlkampf.object.Type;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-public class StageBlock extends GameObject {
+public class StageBlock extends AbstractGameObject {
     public StageBlock(int positionX, int positionY, int width, int height) {
         super("Stage Block", Type.COLLIDABLE, positionX, positionY, width, height);
     }

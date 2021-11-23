@@ -1,10 +1,10 @@
 package de.itg.wahlkampf;
 
-import de.itg.wahlkampf.object.GameObject;
+import de.itg.wahlkampf.object.AbstractGameObject;
 import de.itg.wahlkampf.object.ObjectHandler;
 import de.itg.wahlkampf.object.Type;
 import de.itg.wahlkampf.utilities.InputListener;
-import de.itg.wahlkampf.utilities.particlesystem.Particle;
+import de.itg.wahlkampf.utilities.particlesystem.AbstractParticle;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
@@ -104,7 +104,7 @@ public class Game extends Canvas implements Runnable {
     private void onTick() {
         if (objectHandler == null)
             return;
-        objectHandler.getGameObjects().forEach(GameObject::onTick);
+        objectHandler.getGameObjects().forEach(AbstractGameObject::onTick);
     }
 
     private void onRender() {
@@ -120,14 +120,14 @@ public class Game extends Canvas implements Runnable {
         Wrapper.WRAPPER_INSTANCE.renderer.textWithShadow(graphics, "FPS: " + framesPerSecond, 1, 25, Color.white);
         if (objectHandler == null)
             return;
-        for (GameObject gameObject : objectHandler.getGameObjects()) {
+        for (AbstractGameObject gameObject : objectHandler.getGameObjects()) {
             gameObject.onRender(graphics);
             if (gameObject.getType() == Type.PLAYER) {
                 Wrapper.WRAPPER_INSTANCE.renderer.textWithShadow(graphics, gameObject.getName(), gameObject.getPositionX(), gameObject.getPositionY(), Color.WHITE);
             }
         }
 
-        for (Particle particle : Wrapper.WRAPPER_INSTANCE.particleHandler.getParticleList()) {
+        for (AbstractParticle particle : Wrapper.WRAPPER_INSTANCE.particleHandler.getParticleList()) {
             particle.drawParticle(graphics);
         }
 
