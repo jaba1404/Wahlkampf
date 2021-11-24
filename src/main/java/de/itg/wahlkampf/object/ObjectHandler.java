@@ -18,6 +18,8 @@ public class ObjectHandler {
             addObject(new StageBlock(x, y, width, 20));
             x += MathHelper.getRandomInt(width, width + 200);
         }
+        addObject(new StageBlock(x, y - 60, 130, 20));
+
         addObject(new Player());
 
     }
