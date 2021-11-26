@@ -15,10 +15,13 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     private int weight;
     private int damageAmount;
     private int jumpHeight;
+    private int id;
     AnimationUtil animationUtil = new AnimationUtil();
+    int test;
 
-    public AbstractPlayerObject(String name, int weight, int positionX, int positionY, int width, int height) {
+    public AbstractPlayerObject(String name, int id, int weight, int positionX, int positionY, int width, int height) {
         super(name, Type.PLAYER, positionX, positionY, width, height);
+        this.id = id;
         movement = new Movement();
     }
 
@@ -29,18 +32,45 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         }
         if (!InputListener.KEY_LIST.contains(KeyEvent.VK_SPACE))
             jump = true;
-        for (Integer integer : InputListener.KEY_LIST) {
-            switch (integer) {
-                //case KeyEvent.VK_W -> move(Direction.UP);
-                case KeyEvent.VK_S -> move(Direction.DOWN);
-                case KeyEvent.VK_A -> move(Direction.LEFT);
-                case KeyEvent.VK_D -> move(Direction.RIGHT);
-                case KeyEvent.VK_SPACE -> {
-                    if (jump) {
-                        int height = 60;
-                        jump(height);
-                        if(animationUtil.getValue() >= height) {
-                            jump = false;
+        switch (id) {
+            case 0 -> {
+                for (Integer integer : InputListener.KEY_LIST) {
+                    switch (integer) {
+                        //case KeyEvent.VK_W -> move(Direction.UP);
+                        case KeyEvent.VK_S -> move(Direction.DOWN);
+                        case KeyEvent.VK_A -> move(Direction.LEFT);
+                        case KeyEvent.VK_D -> move(Direction.RIGHT);
+                        case KeyEvent.VK_SPACE -> {
+                            if (jump) {
+                                int height = 60;
+                                jump((int) animationUtil.getValue(height, 5, 1, 60));
+                                if (animationUtil.getValue() >= height) {
+                                    jump = false;
+                                    animationUtil.reset();
+                                }
+                                jump = false;
+                            }
+                        }
+                    }
+                }
+            }
+            case 1 -> {
+                for (Integer integer : InputListener.KEY_LIST) {
+                    switch (integer) {
+                        //case KeyEvent.VK_W -> move(Direction.UP);
+                        case KeyEvent.VK_UP -> move(Direction.DOWN);
+                        case KeyEvent.VK_LEFT -> move(Direction.LEFT);
+                        case KeyEvent.VK_RIGHT -> move(Direction.RIGHT);
+                        case KeyEvent.VK_SHIFT -> {
+                            if (jump) {
+                                int height = 60;
+                                jump((int) animationUtil.getValue(height, 5, 1, 60));
+                                if (animationUtil.getValue() >= height) {
+                                    jump = false;
+                                    animationUtil.reset();
+                                }
+                                jump = false;
+                            }
                         }
                     }
                 }
@@ -71,9 +101,7 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     }
 
     public void jump(int height) {
-        int test;
-        test = (int) animationUtil.getValue(height,5f, 1,40);
-        movement.jump(this, test);
+        movement.jump(this, height);
     }
 
     public void fall(float multiplier) {

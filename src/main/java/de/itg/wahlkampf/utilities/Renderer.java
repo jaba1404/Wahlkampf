@@ -1,6 +1,10 @@
 package de.itg.wahlkampf.utilities;
 
+import de.itg.wahlkampf.Game;
+
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public class Renderer {
     public void drawCircle(Graphics graphics, int x, int y, int width, int height, Color color) {
@@ -26,5 +30,18 @@ public class Renderer {
     public void textWithShadow(Graphics graphics, String string, int x, int y, Color color) {
         text(graphics, string, x + 1, y + 1, Color.black);
         text(graphics, string, x, y, color);
+    }
+    public void img(Graphics g, BufferedImage image, int x, int y) throws IOException {
+        //g.drawImage(img, x, y, null);
+        g.drawImage(image, x, y, Game.WIDTH, Game.HEIGHT, null);
+    }
+    public void img(Graphics g, BufferedImage image, int x, int y, int width, int height) throws IOException {
+        //g.drawImage(img, x, y, null);
+        g.drawImage(image, x, y, width, height, null);
+    }
+
+    public void img2(Graphics g, BufferedImage image, int x, int y) throws IOException {
+        //g.drawImage(img, x, y, null);
+        g.drawImage(image, x, y, null);
     }
 }

@@ -2,6 +2,7 @@ package de.itg.wahlkampf.object;
 
 import de.itg.wahlkampf.object.objects.StageBlock;
 import de.itg.wahlkampf.object.players.Player;
+import de.itg.wahlkampf.object.players.TestPlayer;
 import de.itg.wahlkampf.utilities.MathHelper;
 
 import java.util.ArrayList;
@@ -20,7 +21,8 @@ public class ObjectHandler {
         }
         addObject(new StageBlock(x, y - 60, 130, 20));
 
-        addObject(new Player());
+        addObject(new Player(0));
+        addObject(new TestPlayer(1));
 
     }
 

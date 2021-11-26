@@ -8,8 +8,9 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class Player extends AbstractPlayerObject {
-    public Player() {
-        super("Player", 30, 120, 10, 20, 20);
+
+    public Player(int id) {
+        super("Player",id, 30, 120, 10, 20, 20);
     }
 
     @Override
