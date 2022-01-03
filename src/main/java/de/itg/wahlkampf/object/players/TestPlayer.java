@@ -19,7 +19,8 @@ public class TestPlayer extends AbstractPlayerObject {
     @Override
     public void onRender(Graphics graphics) {
         try {
-            Wrapper.WRAPPER_INSTANCE.renderer.img(graphics, ImageIO.read(new File("C:\\Users\\herrj\\Desktop\\test01 cut.png")), getPositionX(), getPositionY(),getWidth(),getHeight());
+            Wrapper.WRAPPER_INSTANCE.renderer.img(graphics, ImageIO.read(new File("resources\\test01 cut.png")), getPositionX(), getPositionY(),getWidth(),getHeight());
+            Wrapper.WRAPPER_INSTANCE.renderer.drawCircle(graphics, getPositionX(), getEyePosY(), 5,5,Color.RED);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -37,6 +38,11 @@ public class TestPlayer extends AbstractPlayerObject {
 
     @Override
     public void keyReleased(KeyEvent e) {
+
+    }
+
+    @Override
+    public void attack(AbstractPlayerObject enemy) {
 
     }
 }
