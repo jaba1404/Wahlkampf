@@ -4,7 +4,10 @@ import de.itg.wahlkampf.Game;
 import de.itg.wahlkampf.object.boundingbox.AxisAligned;
 import de.itg.wahlkampf.utilities.*;
 
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 
 
 public abstract class AbstractPlayerObject extends AbstractGameObject {
@@ -16,6 +19,7 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     private int weight;
     private int damageAmount;
     private int jumpHeight;
+    private MusicHelper musicHelper;
     private int id;
     private Direction facing = Direction.RIGHT;
     AnimationUtil animationUtil = new AnimationUtil();
@@ -26,6 +30,7 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         this.id = id;
         movement = new Movement();
         mathHelper = new MathHelper();
+        musicHelper = new MusicHelper();
     }
 
     public abstract void attack(AbstractPlayerObject enemy);

@@ -13,13 +13,13 @@ import java.io.IOException;
 
 public class TestPlayer extends AbstractPlayerObject {
     public TestPlayer(int id) {
-        super("Test Player", id, 50, 180, 10, 23, 55);
+        super("Test Player", id, 50, 180, 10, 21, 53);
     }
-//220 höhe 92 breite
+//214 höhe 86 breite
     @Override
     public void onRender(Graphics graphics) {
         try {
-            Wrapper.WRAPPER_INSTANCE.renderer.img(graphics, ImageIO.read(new File("resources\\test01 cut.png")), getPositionX(), getPositionY(),getWidth(),getHeight());
+            Wrapper.WRAPPER_INSTANCE.renderer.img(graphics, ImageIO.read(new File("resources\\Merkel.png")), getPositionX(), getPositionY(),getWidth(),getHeight());
             Wrapper.WRAPPER_INSTANCE.renderer.drawCircle(graphics, getPositionX(), getEyePosY(), 5,5,Color.RED);
         } catch (IOException e) {
             e.printStackTrace();
