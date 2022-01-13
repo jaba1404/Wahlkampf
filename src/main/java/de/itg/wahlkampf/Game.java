@@ -6,8 +6,11 @@ import de.itg.wahlkampf.object.Type;
 import de.itg.wahlkampf.utilities.InputListener;
 import de.itg.wahlkampf.utilities.particlesystem.AbstractParticle;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
+import java.io.File;
+import java.io.IOException;
 
 public class Game extends Canvas implements Runnable {
     private static final String GAME_TITLE = "Wahlkampf";
@@ -115,9 +118,14 @@ public class Game extends Canvas implements Runnable {
         }
 
         Graphics graphics = bufferStrategy.getDrawGraphics();
-        Wrapper.WRAPPER_INSTANCE.renderer.drawFillRectangle(graphics, 0, 0, GAME_DIMENSION.width, GAME_DIMENSION.height, Color.black);
+        try {
+            Wrapper.WRAPPER_INSTANCE.renderer.img(graphics, ImageIO.read(new File("resources\\hintergrund 1.gif")), 0, 0,GAME_DIMENSION.width,GAME_DIMENSION.height);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Wrapper.WRAPPER_INSTANCE.renderer.textWithShadow(graphics, GAME_TITLE, 1, 10, Color.white);
         Wrapper.WRAPPER_INSTANCE.renderer.textWithShadow(graphics, "FPS: " + framesPerSecond, 1, 25, Color.white);
+
         if (objectHandler == null)
             return;
         for (AbstractGameObject gameObject : objectHandler.getGameObjects()) {
