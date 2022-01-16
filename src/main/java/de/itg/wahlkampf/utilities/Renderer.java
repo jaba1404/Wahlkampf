@@ -35,7 +35,7 @@ public class Renderer {
         //g.drawImage(img, x, y, null);
         g.drawImage(image, x, y, Game.WIDTH, Game.HEIGHT, null);
     }
-    public void img(Graphics g, BufferedImage image, int x, int y, int width, int height) throws IOException {
+    public void img(Graphics g, BufferedImage image, int x, int y, int width, int height) {
         //g.drawImage(img, x, y, null);
         g.drawImage(image, x, y, width, height, null);
     }

@@ -30,21 +30,17 @@ public class StageBlock extends AbstractGameObject {
         if(bufferedImage == null) {
             Wrapper.WRAPPER_INSTANCE.renderer.drawFillRectangle(graphics, getPositionX(), getPositionY(), getWidth(), getHeight(), color);
         }else {
-            try {
                 int amount = getWidth() / 30;
                 int positionX = getPositionX();
                 for(int i = 0; i <= amount; i++) {
                     if(i == 0) {
-                        Wrapper.WRAPPER_INSTANCE.renderer.img(graphics, bufferedImage[0], positionX, getPositionY(), 30, 30);
+                        Wrapper.WRAPPER_INSTANCE.renderer.img(graphics, bufferedImage[0], positionX, getPositionY(), 30, getHeight());
                     }else if(i == amount ) {
-                        Wrapper.WRAPPER_INSTANCE.renderer.img(graphics, bufferedImage[2], positionX, getPositionY(), amount, 30);
+                        Wrapper.WRAPPER_INSTANCE.renderer.img(graphics, bufferedImage[2], positionX, getPositionY(), amount, getHeight());
                     }else {
-                        Wrapper.WRAPPER_INSTANCE.renderer.img(graphics, bufferedImage[1], positionX, getPositionY(), 30 , 30);
+                        Wrapper.WRAPPER_INSTANCE.renderer.img(graphics, bufferedImage[1], positionX, getPositionY(), 30 , getHeight());
                     }
                     positionX += 30;
-                }
-                } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }

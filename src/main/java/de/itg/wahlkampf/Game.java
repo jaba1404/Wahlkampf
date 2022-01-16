@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public class Game extends Canvas implements Runnable {
     private static final String GAME_TITLE = "Wahlkampf";
-    private static final Dimension GAME_DIMENSION = new Dimension(1080, 720);
+    private static final Dimension GAME_DIMENSION = new Dimension(1280, 720);
     private static final double UPDATE_CAP = 1.0 / 60.0;
     public static Game instance;
 
