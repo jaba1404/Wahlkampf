@@ -31,7 +31,7 @@ public class ObjectHandler {
             }
             x += MathHelper.getRandomInt(width, width + 200);
         }
-        addObject(new StageBlock(0, 660, 1080, 30,new Color(0,0,0,0)));
+        addObject(new StageBlock(0, 660, Game.instance.getWidth(), 30,new Color(0,0,0,0)));
         addObject(new Player(0));
         addObject(new TestPlayer(1));
 
