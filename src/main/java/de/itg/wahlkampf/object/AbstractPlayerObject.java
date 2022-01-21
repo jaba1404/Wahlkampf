@@ -1,7 +1,6 @@
 package de.itg.wahlkampf.object;
 
 import de.itg.wahlkampf.Game;
-import de.itg.wahlkampf.Wrapper;
 import de.itg.wahlkampf.object.boundingbox.AxisAligned;
 import de.itg.wahlkampf.utilities.*;
 
@@ -28,8 +27,9 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     private Direction facing = Direction.RIGHT;
     private final AnimationUtil animationUtil = new AnimationUtil();
     private BufferedImage bufferedImage;
-    private BufferedImage bufferedImageFlip;
-    int test;
+    private BufferedImage bufferedImageFlipH;
+    private BufferedImage bufferedImageFlipV;
+    private final Renderer renderer;
 
     private static final int FLIP_VERTICAL = 1;
     private static final int FLIP_HORIZONTAL = -1;
@@ -38,12 +38,14 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         super(name, Type.PLAYER, positionX, positionY, width, height);
         this.id = id;
         this.path = path;
+        renderer = Game.instance.getRenderer();
         movement = new Movement();
         mathHelper = new MathHelper();
         musicHelper = new MusicHelper();
         try {
             bufferedImage = ImageIO.read(new File(path));
-            bufferedImageFlip = flip(bufferedImage, FLIP_HORIZONTAL);
+            bufferedImageFlipH = flip(bufferedImage, FLIP_HORIZONTAL);
+            bufferedImageFlipV = flip(bufferedImage, FLIP_VERTICAL);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,10 +56,11 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
 
     @Override
     public void onRender(Graphics graphics) {
-        final BufferedImage test = facing == Direction.RIGHT ? bufferedImage : bufferedImageFlip;
-        Wrapper.WRAPPER_INSTANCE.renderer.img(graphics,test, getPositionX(), getPositionY(),getWidth(),getHeight());
-        Wrapper.WRAPPER_INSTANCE.renderer.drawCircle(graphics, getPositionX(), getEyePosY(), 5,5,Color.RED);
+        final BufferedImage test = facing == Direction.RIGHT ? bufferedImage : bufferedImageFlipH;
+        renderer.img(graphics, test, getPositionX(), getPositionY(), getWidth(), getHeight());
+        renderer.drawCircle(graphics, getPositionX(), getEyePosY(), 5, 5, Color.RED);
     }
+
     public void controlPlayer() {
         collide();
         if (!isOnGround() && jump) {
@@ -118,7 +121,6 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
             if (gameObject instanceof AbstractPlayerObject && gameObject != this) {
                 final AxisAligned objectsAxisAligned = new AxisAligned(gameObject.getPositionX(), gameObject.getPositionX() + gameObject.getWidth(), gameObject.getPositionY(), gameObject.getPositionY() + gameObject.getHeight());
                 if (getEyePosY() >= objectsAxisAligned.getMinY() && getEyePosY() <= objectsAxisAligned.getMaxY()) {
-                    System.out.println(mathHelper.getDistanceTo(this, gameObject));
                     if (mathHelper.getDistanceTo(this, gameObject) <= distance) {
                         return (AbstractPlayerObject) gameObject;
                     }
@@ -153,18 +155,18 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
 
     public void move(Direction direction) {
         movement.move(this, direction);
-        if(direction != Direction.UP && direction != Direction.DOWN) {
+        if (direction != Direction.UP && direction != Direction.DOWN) {
             this.facing = direction;
         }
     }
+
     private BufferedImage flip(BufferedImage image, int direction) {
         int width = image.getWidth();
         int height = image.getHeight();
         final BufferedImage flipped = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
 
-        for(int y = 0; y < height; y++) {
-            for(int x = 0; x < width; x++) {
-                System.out.println(image.getRGB(0, 0));
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
                 switch (direction) {
                     case FLIP_HORIZONTAL -> flipped.setRGB((width - 1) - x, y, image.getRGB(x, y));
                     case FLIP_VERTICAL -> flipped.setRGB(x, (height - 1) - y, image.getRGB(x, y));
@@ -173,6 +175,7 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         }
         return flipped;
     }
+
     public void jump(int height) {
         movement.jump(this, height);
     }

@@ -4,7 +4,9 @@ import de.itg.wahlkampf.object.AbstractGameObject;
 import de.itg.wahlkampf.object.ObjectHandler;
 import de.itg.wahlkampf.object.Type;
 import de.itg.wahlkampf.utilities.InputListener;
+import de.itg.wahlkampf.utilities.Renderer;
 import de.itg.wahlkampf.utilities.particlesystem.AbstractParticle;
+import de.itg.wahlkampf.utilities.particlesystem.ParticleHandler;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -20,6 +22,8 @@ public class Game extends Canvas implements Runnable {
 
     public ObjectHandler objectHandler;
     private final Window window;
+    private Renderer renderer;
+    private ParticleHandler particleHandler;
     private boolean running;
     private Thread thread;
 
@@ -27,9 +31,13 @@ public class Game extends Canvas implements Runnable {
 
     public Game() {
         instance = this;
+        renderer = new Renderer();
         this.addKeyListener(new InputListener(this));
         window = new Window(GAME_TITLE, GAME_DIMENSION.width, GAME_DIMENSION.height, this);
         objectHandler = new ObjectHandler();
+        particleHandler = new ParticleHandler();
+
+        renderer = new Renderer();
     }
 
     public synchronized void start() {
@@ -118,24 +126,25 @@ public class Game extends Canvas implements Runnable {
         }
 
         Graphics graphics = bufferStrategy.getDrawGraphics();
+
         try {
-            Wrapper.WRAPPER_INSTANCE.renderer.img(graphics, ImageIO.read(new File("resources\\hintergrund 1.gif")), 0, 0,GAME_DIMENSION.width,GAME_DIMENSION.height);
+            renderer.img(graphics,ImageIO.read(new File("resources\\hintergrund 1.gif")), 0, 0, GAME_DIMENSION.width, GAME_DIMENSION.height);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Wrapper.WRAPPER_INSTANCE.renderer.textWithShadow(graphics, GAME_TITLE, 1, 10, Color.white);
-        Wrapper.WRAPPER_INSTANCE.renderer.textWithShadow(graphics, "FPS: " + framesPerSecond, 1, 25, Color.white);
+        renderer.textWithShadow(graphics,GAME_TITLE, 1, 10, Color.white);
+        renderer.textWithShadow(graphics,"FPS: " + framesPerSecond, 1, 25, Color.white);
 
         if (objectHandler == null)
             return;
         for (AbstractGameObject gameObject : objectHandler.getGameObjects()) {
             gameObject.onRender(graphics);
             if (gameObject.getType() == Type.PLAYER) {
-                Wrapper.WRAPPER_INSTANCE.renderer.textWithShadow(graphics, gameObject.getName(), gameObject.getPositionX(), gameObject.getPositionY(), Color.WHITE);
+                renderer.textWithShadow(graphics,gameObject.getName(), gameObject.getPositionX(), gameObject.getPositionY(), Color.WHITE);
             }
         }
 
-        for (AbstractParticle particle : Wrapper.WRAPPER_INSTANCE.particleHandler.getParticleList()) {
+        for (AbstractParticle particle : particleHandler.getParticleList()) {
             particle.drawParticle(graphics);
         }
 
@@ -146,6 +155,10 @@ public class Game extends Canvas implements Runnable {
 
     public ObjectHandler getObjectHandler() {
         return objectHandler;
+    }
+
+    public Renderer getRenderer() {
+        return renderer;
     }
 
     public boolean isFocused() {

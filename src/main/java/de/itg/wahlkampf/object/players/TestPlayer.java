@@ -1,15 +1,8 @@
 package de.itg.wahlkampf.object.players;
 
-import de.itg.wahlkampf.Wrapper;
 import de.itg.wahlkampf.object.AbstractPlayerObject;
-import de.itg.wahlkampf.utilities.particlesystem.ParticleType;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 public class TestPlayer extends AbstractPlayerObject {
     public TestPlayer(int id) {
