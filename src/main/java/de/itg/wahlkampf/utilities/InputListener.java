@@ -24,14 +24,14 @@ public class InputListener extends KeyAdapter {
     public void keyPressed(KeyEvent e) {
         if (!KEY_LIST.contains(e.getKeyCode()))
             KEY_LIST.add(e.getKeyCode());
-        game.objectHandler.getGameObjects().stream().filter(PLAYER_OBJECT_PREDICATE).forEach(gameObject -> gameObject.onKeyPressed(e));
+        game.getObjectHandler().getGameObjects().stream().filter(PLAYER_OBJECT_PREDICATE).forEach(gameObject -> gameObject.onKeyPressed(e));
         super.keyPressed(e);
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         KEY_LIST.removeIf(integer -> integer.equals(e.getKeyCode()));
-        game.objectHandler.getGameObjects().stream().filter(PLAYER_OBJECT_PREDICATE).forEach(gameObject -> gameObject.keyReleased(e));
+        game.getObjectHandler().getGameObjects().stream().filter(PLAYER_OBJECT_PREDICATE).forEach(gameObject -> gameObject.keyReleased(e));
         super.keyReleased(e);
     }
 }

@@ -4,18 +4,20 @@ import de.itg.wahlkampf.object.AbstractGameObject;
 
 public class Movement {
     public static final int SPEED = 5;
+    public static final int JUMP_MOTION = 8;
+    private final MathHelper mathHelper = new MathHelper();
 
     public void move(AbstractGameObject object, Direction direction) {
         switch (direction) {
-            case UP -> object.setPositionY(object.getPositionY() - SPEED);
-            case DOWN -> object.setPositionY(object.getPositionY() + SPEED);
-            case LEFT -> object.setPositionX(object.getPositionX() - SPEED);
-            case RIGHT -> object.setPositionX(object.getPositionX() + SPEED);
+            case UP -> object.setPositionY(mathHelper.interpolateValue(object.getPositionY(),object.getPositionY() - SPEED,1));
+            case DOWN -> object.setPositionY(mathHelper.interpolateValue(object.getPositionY(),object.getPositionY() + 60, 1));
+            case LEFT -> object.setPositionX(mathHelper.interpolateValue(object.getPositionX(),object.getPositionX() - SPEED, 1));
+            case RIGHT -> object.setPositionX(mathHelper.interpolateValue(object.getPositionX(),object.getPositionX() + SPEED, 1));
         }
     }
 
     public void jump(AbstractGameObject object, int height) {
-        object.setPositionY(object.getPositionY() - height);
+        object.setPositionY(mathHelper.interpolateValue(object.getPositionY(),object.getPositionY() - height,1));
     }
 
     public void fall(AbstractGameObject gameObject, float multiplier) {

@@ -8,23 +8,23 @@ public class MathHelper {
 
     private static final Random RANDOM = new Random();
 
-    public static int clampInt(int num, int min, int max) {
+    public int clampInt(int num, int min, int max) {
         return num < min ? min : (Math.min(num, max));
     }
 
-    public static float clampFloat(float num, float min, float max) {
+    public float clampFloat(float num, float min, float max) {
         return num < min ? min : (Math.min(num, max));
     }
 
-    public static double clampDouble(double num, double min, double max) {
+    public double clampDouble(double num, double min, double max) {
         return num < min ? min : (Math.min(num, max));
     }
 
-    public static int getRandomInt(int min, int max) {
+    public int getRandomInt(int min, int max) {
         return min >= max ? min : RANDOM.nextInt(max - min + 1) + min;
     }
 
-    public static float getRandomFloat(float min, float max) {
+    public float getRandomFloat(float min, float max) {
         return RANDOM.nextFloat() * (max - min) + min;
     }
 
@@ -33,5 +33,9 @@ public class MathHelper {
         final float yDelta = from.getPositionY() - to.getPositionY();
 
         return (float) Math.sqrt(Math.pow(xDelta, 2) + Math.pow(yDelta, 2));
+    }
+    public int interpolateValue(int start, int end, int pct)
+    {
+        return start + (end - start) * pct;
     }
 }

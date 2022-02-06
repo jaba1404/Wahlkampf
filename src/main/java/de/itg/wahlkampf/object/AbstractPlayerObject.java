@@ -25,7 +25,6 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     private MusicHelper musicHelper;
     private int id;
     private Direction facing = Direction.RIGHT;
-    private final AnimationUtil animationUtil = new AnimationUtil();
     private BufferedImage bufferedImage;
     private BufferedImage bufferedImageFlipH;
     private BufferedImage bufferedImageFlipV;
@@ -35,7 +34,7 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     private static final int FLIP_HORIZONTAL = -1;
 
     public AbstractPlayerObject(String name, String path, int id, int weight, int positionX, int positionY, int width, int height) {
-        super(name, Type.PLAYER, positionX, positionY, width, height);
+        super(name, Type.PLAYER, positionX, positionY, width, height, true);
         this.id = id;
         this.path = path;
         renderer = Game.instance.getRenderer();
@@ -66,24 +65,25 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         if (!isOnGround() && jump) {
             fall(1.005f);
         }
-        if (!InputListener.KEY_LIST.contains(KeyEvent.VK_SPACE))
+        if (!InputListener.KEY_LIST.contains(KeyEvent.VK_SPACE) && !InputListener.KEY_LIST.contains(KeyEvent.VK_SHIFT))
             jump = true;
         switch (id) {
             case 0 -> {
                 for (Integer integer : InputListener.KEY_LIST) {
                     switch (integer) {
                         //case KeyEvent.VK_W -> facing = Direction.UP;
-                        case KeyEvent.VK_S -> move(Direction.DOWN);
+                        case KeyEvent.VK_S -> {
+                            final AbstractGameObject gameObject = getObjectStandingOn();
+                            if (gameObject != null && gameObject.isPassThrough()) {
+                                setPositionY(getPositionY() + getHeight() / 2 + getObjectStandingOn().getHeight());
+                            }
+                        }
                         case KeyEvent.VK_A -> move(Direction.LEFT);
                         case KeyEvent.VK_D -> move(Direction.RIGHT);
                         case KeyEvent.VK_SPACE -> {
                             if (jump) {
                                 int height = 60;
-                                jump((int) animationUtil.getValue(height, 5, 1, 60));
-                                if (animationUtil.getValue() >= height) {
-                                    jump = false;
-                                    animationUtil.reset();
-                                }
+                                jump(60);
                                 jump = false;
                             }
                         }
@@ -94,17 +94,17 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
                 for (Integer integer : InputListener.KEY_LIST) {
                     switch (integer) {
                         //case KeyEvent.VK_UP -> facing = Direction.UP;
-                        case KeyEvent.VK_DOWN -> move(Direction.DOWN);
+                        case KeyEvent.VK_DOWN -> {
+                            final AbstractGameObject gameObject = getObjectStandingOn();
+                            if (gameObject != null && gameObject.isPassThrough()) {
+                                setPositionY(getPositionY() + getHeight() / 2 + getObjectStandingOn().getHeight());
+                            }
+                        }
                         case KeyEvent.VK_LEFT -> move(Direction.LEFT);
                         case KeyEvent.VK_RIGHT -> move(Direction.RIGHT);
                         case KeyEvent.VK_SHIFT -> {
                             if (jump) {
-                                int height = 60;
-                                jump((int) animationUtil.getValue(height, 5, 1, 60));
-                                if (animationUtil.getValue() >= height) {
-                                    jump = false;
-                                    animationUtil.reset();
-                                }
+                                jump(60);
                                 jump = false;
                             }
                         }
@@ -114,10 +114,10 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         }
     }
 
-    public AbstractPlayerObject getRayTrace(int distance) {
+    public AbstractPlayerObject getRayTrace(int distance, Direction direction) {
         final AxisAligned playerAxisAligned = new AxisAligned(this.getPositionX(), this.getPositionX() + this.getWidth(), this.getPositionY(), this.getPositionY() + this.getHeight());
         onGround = false;
-        for (AbstractGameObject gameObject : Game.instance.objectHandler.getGameObjects()) {
+        for (AbstractGameObject gameObject : Game.instance.getObjectHandler().getGameObjects()) {
             if (gameObject instanceof AbstractPlayerObject && gameObject != this) {
                 final AxisAligned objectsAxisAligned = new AxisAligned(gameObject.getPositionX(), gameObject.getPositionX() + gameObject.getWidth(), gameObject.getPositionY(), gameObject.getPositionY() + gameObject.getHeight());
                 if (getEyePosY() >= objectsAxisAligned.getMinY() && getEyePosY() <= objectsAxisAligned.getMaxY()) {
@@ -130,12 +130,24 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         return null;
     }
 
-    /* need max jump height and animate with animationutil to smoothen it out
-     */
+    public AbstractGameObject getObjectStandingOn() {
+        if (!onGround)
+            return null;
+        final AxisAligned playerAxisAligned = new AxisAligned(this.getPositionX(), this.getPositionX() + this.getWidth(), this.getPositionY(), this.getPositionY() + this.getHeight());
+        final int midPoint = playerAxisAligned.getMinX() + playerAxisAligned.getMaxX() / 2;
+        for (AbstractGameObject gameObject : Game.instance.getObjectHandler().getGameObjects()) {
+            final AxisAligned objectsAxisAligned = new AxisAligned(gameObject.getPositionX(), gameObject.getPositionX() + gameObject.getWidth(), gameObject.getPositionY(), gameObject.getPositionY() + gameObject.getHeight());
+            if (playerAxisAligned.getMaxY() == objectsAxisAligned.getMinY() - 1 && playerAxisAligned.getMaxX() > objectsAxisAligned.getMinX() && playerAxisAligned.getMinX() < objectsAxisAligned.getMaxX()) {
+                return gameObject;
+            }
+        }
+        return null;
+    }
+
     public void collide() {
         final AxisAligned playerAxisAligned = new AxisAligned(this.getPositionX(), this.getPositionX() + this.getWidth(), this.getPositionY(), this.getPositionY() + this.getHeight());
         onGround = false;
-        for (AbstractGameObject gameObject : Game.instance.objectHandler.getGameObjects()) {
+        for (AbstractGameObject gameObject : Game.instance.getObjectHandler().getGameObjects()) {
             final AxisAligned objectsAxisAligned = new AxisAligned(gameObject.getPositionX(), gameObject.getPositionX() + gameObject.getWidth(), gameObject.getPositionY(), gameObject.getPositionY() + gameObject.getHeight());
             if (playerAxisAligned.getMaxX() > objectsAxisAligned.getMinX() && playerAxisAligned.getMinX() < objectsAxisAligned.getMaxX()) {
                 if (playerAxisAligned.getMaxY() >= objectsAxisAligned.getMinY() - 1 && (playerAxisAligned.getMinY() + (this.getHeight() / 2)) < (objectsAxisAligned.getMinY() + objectsAxisAligned.getMaxY()) / 2) {

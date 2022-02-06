@@ -14,7 +14,7 @@ public class Player extends AbstractPlayerObject {
     @Override
     public void onTick() {
         controlPlayer();
-        AbstractPlayerObject enemy = getRayTrace(100);
+        AbstractPlayerObject enemy = getRayTrace(100, getFacing());
         if (enemy != null) {
 
         }

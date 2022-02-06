@@ -12,7 +12,8 @@ public class Renderer {
         graphics.drawOval(x, y, width, height);
     }
 
-    public void text(Graphics graphics,String string, int x, int y, Color color) {
+    public void text(Graphics graphics,String string, int x, int y, Color color, Font font) {
+        graphics.setFont(font);
         graphics.setColor(color);
         graphics.drawString(string, x, y);
     }
@@ -27,9 +28,10 @@ public class Renderer {
         graphics.drawRect(x, y, width, height);
     }
 
-    public void textWithShadow(Graphics graphics,String string, int x, int y, Color color) {
-        text(graphics,string, x + 1, y + 1, Color.black);
-        text(graphics,string, x, y, color);
+    public void textWithShadow(Graphics graphics,String string, int x, int y, Color color, Font font) {
+        graphics.setFont(font);
+        text(graphics,string, x + 1, y + 1, Color.black, font);
+        text(graphics,string, x, y, color, font);
     }
 
     public void img(Graphics graphics,BufferedImage image, int x, int y) throws IOException {

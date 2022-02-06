@@ -14,15 +14,15 @@ public class StageBlock extends AbstractGameObject {
     private final BufferedImage[] bufferedImage;
     private final Renderer renderer;
 
-    public StageBlock(int positionX, int positionY, int width, int height, Color color) {
-        super("Stage Block", Type.COLLIDABLE, positionX, positionY, width, height);
+    public StageBlock(int positionX, int positionY, int width, int height, Color color, boolean passThrough) {
+        super("Stage Block", Type.COLLIDABLE, positionX, positionY, width, height, passThrough);
         this.color = color;
         bufferedImage = null;
         renderer = Game.instance.getRenderer();
     }
 
-    public StageBlock(int positionX, int positionY, int width, int height, BufferedImage[] bufferedImage) {
-        super("Stage Block", Type.COLLIDABLE, positionX, positionY, width, height);
+    public StageBlock(int positionX, int positionY, int width, int height, BufferedImage[] bufferedImage, boolean passThrough) {
+        super("Stage Block", Type.COLLIDABLE, positionX, positionY, width, height, passThrough);
         this.bufferedImage = bufferedImage;
         this.color = null;
         renderer = Game.instance.getRenderer();

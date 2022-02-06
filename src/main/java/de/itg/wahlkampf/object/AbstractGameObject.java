@@ -7,14 +7,16 @@ public abstract class AbstractGameObject {
     private String name;
     private Type type;
     private int positionX, positionY, width, height;
+    private boolean passThrough;
 
-    public AbstractGameObject(String name, Type type, int positionX, int positionY, int width, int height) {
+    public AbstractGameObject(String name, Type type, int positionX, int positionY, int width, int height, boolean passTrough) {
         this.name = name;
         this.type = type;
         this.positionX = positionX;
         this.positionY = positionY;
         this.width = width;
         this.height = height;
+        this.passThrough = passTrough;
     }
 
     public abstract void onRender(Graphics graphics);
@@ -51,6 +53,14 @@ public abstract class AbstractGameObject {
 
     public int getPositionY() {
         return positionY;
+    }
+
+    public boolean isPassThrough() {
+        return passThrough;
+    }
+
+    public void setPassThrough(boolean passThrough) {
+        this.passThrough = passThrough;
     }
 
     public void setPositionY(int positionY) {

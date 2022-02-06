@@ -1,43 +1,64 @@
 package de.itg.wahlkampf;
 
+import de.itg.wahlkampf.menu.Menu;
 import de.itg.wahlkampf.object.AbstractGameObject;
 import de.itg.wahlkampf.object.ObjectHandler;
 import de.itg.wahlkampf.object.Type;
+import de.itg.wahlkampf.setting.SettingManager;
+import de.itg.wahlkampf.setting.settings.SettingCheckBox;
+import de.itg.wahlkampf.utilities.Font;
+import de.itg.wahlkampf.utilities.ImageHelper;
 import de.itg.wahlkampf.utilities.InputListener;
 import de.itg.wahlkampf.utilities.Renderer;
 import de.itg.wahlkampf.utilities.particlesystem.AbstractParticle;
 import de.itg.wahlkampf.utilities.particlesystem.ParticleHandler;
 
 import javax.imageio.ImageIO;
+
 import java.awt.*;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Game extends Canvas implements Runnable {
-    private static final String GAME_TITLE = "Wahlkampf";
+    public static final String GAME_TITLE = "Wahlkampf";
+    public static final String GAME_VERSION = "Alpha 1.0.0";
     private static final Dimension GAME_DIMENSION = new Dimension(1280, 720);
     private static final double UPDATE_CAP = 1.0 / 60.0;
     public static Game instance;
 
-    public ObjectHandler objectHandler;
+    private final ObjectHandler objectHandler;
+    private final ImageHelper imageHelper;
     private final Window window;
-    private Renderer renderer;
-    private ParticleHandler particleHandler;
+    private final Renderer renderer;
+    private final ParticleHandler particleHandler;
+    private final SettingManager settingManager;
+    private final Menu menu;
     private boolean running;
     private Thread thread;
+    private final SettingCheckBox startGame;
+    private final List<BufferedImage> bufferedImages;
 
     private float framesPerSecond = 60;
+    private final Font textFont = new Font("Roboto", Font.PLAIN, 12);
 
     public Game() {
         instance = this;
+        imageHelper = new ImageHelper();
+        bufferedImages = imageHelper.getFrames(new File("resources\\hintergrund 1.gif"));
+        settingManager = new SettingManager();
+        startGame = (SettingCheckBox) Game.instance.getSettingManager().getSettingByName("Start Game");
         renderer = new Renderer();
         this.addKeyListener(new InputListener(this));
         window = new Window(GAME_TITLE, GAME_DIMENSION.width, GAME_DIMENSION.height, this);
+        menu = new Menu();
+        this.addMouseListener(menu);
+        this.addMouseMotionListener(menu);
         objectHandler = new ObjectHandler();
         particleHandler = new ParticleHandler();
-
-        renderer = new Renderer();
     }
 
     public synchronized void start() {
@@ -79,6 +100,7 @@ public class Game extends Canvas implements Runnable {
             frameTime += passedTime;
 
             while (unprocessedTime >= UPDATE_CAP) {
+
                 unprocessedTime -= UPDATE_CAP;
                 render = true;
 
@@ -94,7 +116,8 @@ public class Game extends Canvas implements Runnable {
                         System.out.println("Cleared!");
                     }
                 }
-                onTick();
+                if (startGame.isActive())
+                    onTick();
             }
 
             if (render) {
@@ -126,24 +149,27 @@ public class Game extends Canvas implements Runnable {
         }
 
         Graphics graphics = bufferStrategy.getDrawGraphics();
-
         try {
             renderer.img(graphics,ImageIO.read(new File("resources\\hintergrund 1.gif")), 0, 0, GAME_DIMENSION.width, GAME_DIMENSION.height);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        renderer.textWithShadow(graphics,GAME_TITLE, 1, 10, Color.white);
-        renderer.textWithShadow(graphics,"FPS: " + framesPerSecond, 1, 25, Color.white);
+
+        renderer.textWithShadow(graphics, GAME_TITLE, 1, 10, Color.white, textFont);
+        renderer.textWithShadow(graphics, "FPS: " + framesPerSecond, 1, 25, Color.white, textFont);
+        menu.drawScreen(graphics);
+
 
         if (objectHandler == null)
             return;
-        for (AbstractGameObject gameObject : objectHandler.getGameObjects()) {
-            gameObject.onRender(graphics);
-            if (gameObject.getType() == Type.PLAYER) {
-                renderer.textWithShadow(graphics,gameObject.getName(), gameObject.getPositionX(), gameObject.getPositionY(), Color.WHITE);
+        if (startGame.isActive()) {
+            for (AbstractGameObject gameObject : objectHandler.getGameObjects()) {
+                gameObject.onRender(graphics);
+                if (gameObject.getType() == Type.PLAYER) {
+                    renderer.textWithShadow(graphics, gameObject.getName(), gameObject.getPositionX(), gameObject.getPositionY(), Color.WHITE, textFont);
+                }
             }
         }
-
         for (AbstractParticle particle : particleHandler.getParticleList()) {
             particle.drawParticle(graphics);
         }
@@ -159,6 +185,10 @@ public class Game extends Canvas implements Runnable {
 
     public Renderer getRenderer() {
         return renderer;
+    }
+
+    public SettingManager getSettingManager() {
+        return settingManager;
     }
 
     public boolean isFocused() {
