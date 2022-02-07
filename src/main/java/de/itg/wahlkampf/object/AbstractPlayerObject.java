@@ -3,6 +3,7 @@ package de.itg.wahlkampf.object;
 import de.itg.wahlkampf.Game;
 import de.itg.wahlkampf.object.boundingbox.AxisAligned;
 import de.itg.wahlkampf.utilities.*;
+import de.itg.wahlkampf.utilities.sound.SoundHelper;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -22,7 +23,7 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     private String path;
     private int damageAmount;
     private int jumpHeight;
-    private MusicHelper musicHelper;
+    private final SoundHelper soundHelper;
     private int id;
     private Direction facing = Direction.RIGHT;
     private BufferedImage bufferedImage;
@@ -40,7 +41,7 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         renderer = Game.instance.getRenderer();
         movement = new Movement();
         mathHelper = new MathHelper();
-        musicHelper = new MusicHelper();
+        soundHelper = new SoundHelper();
         try {
             bufferedImage = ImageIO.read(new File(path));
             bufferedImageFlipH = flip(bufferedImage, FLIP_HORIZONTAL);
@@ -55,8 +56,8 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
 
     @Override
     public void onRender(Graphics graphics) {
-        final BufferedImage test = facing == Direction.RIGHT ? bufferedImage : bufferedImageFlipH;
-        renderer.img(graphics, test, getPositionX(), getPositionY(), getWidth(), getHeight());
+        final BufferedImage player = facing == Direction.RIGHT ? bufferedImage : bufferedImageFlipH;
+        renderer.img(graphics, player, getPositionX(), getPositionY(), getWidth(), getHeight());
         renderer.drawCircle(graphics, getPositionX(), getEyePosY(), 5, 5, Color.RED);
     }
 
@@ -78,6 +79,7 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
                                 setPositionY(getPositionY() + getHeight() / 2 + getObjectStandingOn().getHeight());
                             }
                         }
+                        case KeyEvent.VK_X -> attack(null);
                         case KeyEvent.VK_A -> move(Direction.LEFT);
                         case KeyEvent.VK_D -> move(Direction.RIGHT);
                         case KeyEvent.VK_SPACE -> {
@@ -222,6 +224,10 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public SoundHelper getSoundHelper() {
+        return soundHelper;
     }
 
     //https://www.ssbwiki.com/Knockback#Formula

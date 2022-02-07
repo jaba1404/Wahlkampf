@@ -1,11 +1,14 @@
 package de.itg.wahlkampf;
 
+import de.itg.wahlkampf.event.Event;
+import de.itg.wahlkampf.event.impl.SettingChangeEvent;
 import de.itg.wahlkampf.menu.Menu;
 import de.itg.wahlkampf.object.AbstractGameObject;
 import de.itg.wahlkampf.object.ObjectHandler;
 import de.itg.wahlkampf.object.Type;
 import de.itg.wahlkampf.setting.SettingManager;
 import de.itg.wahlkampf.setting.settings.SettingCheckBox;
+import de.itg.wahlkampf.setting.settings.SettingComboBox;
 import de.itg.wahlkampf.utilities.Font;
 import de.itg.wahlkampf.utilities.ImageHelper;
 import de.itg.wahlkampf.utilities.InputListener;
@@ -14,14 +17,15 @@ import de.itg.wahlkampf.utilities.particlesystem.AbstractParticle;
 import de.itg.wahlkampf.utilities.particlesystem.ParticleHandler;
 
 import javax.imageio.ImageIO;
-
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Game extends Canvas implements Runnable {
     public static final String GAME_TITLE = "Wahlkampf";
@@ -40,7 +44,10 @@ public class Game extends Canvas implements Runnable {
     private boolean running;
     private Thread thread;
     private final SettingCheckBox startGame;
+    private final SettingComboBox stageSetting;
     private final List<BufferedImage> bufferedImages;
+    private final Map<String, File> backgroundMap;
+    private File backgroundFile;
 
     private float framesPerSecond = 60;
     private final Font textFont = new Font("Roboto", Font.PLAIN, 12);
@@ -48,9 +55,16 @@ public class Game extends Canvas implements Runnable {
     public Game() {
         instance = this;
         imageHelper = new ImageHelper();
-        bufferedImages = imageHelper.getFrames(new File("resources\\hintergrund 1.gif"));
+        bufferedImages = imageHelper.getFrames(new File("resources\\9BC613A2-35B0-488D-B6AC-E217003CA6C8.gif"));
+        backgroundMap = Stream.of(new Object[][]{
+                {"White House", new File("resources\\hintergrund 1.gif")},
+                {"Red Arena", new File("resources\\9BC613A2-35B0-488D-B6AC-E217003CA6C8.gif")},
+        }).collect(Collectors.toMap(data -> (String) data[0], data -> (File) data[1]));
         settingManager = new SettingManager();
-        startGame = (SettingCheckBox) Game.instance.getSettingManager().getSettingByName("Start Game");
+        startGame = (SettingCheckBox) settingManager.getSettingByName("Start Game");
+        stageSetting = (SettingComboBox) settingManager.getSettingByName("Stage");
+        backgroundFile = backgroundMap.get(stageSetting.getCurrentOption());
+
         renderer = new Renderer();
         this.addKeyListener(new InputListener(this));
         window = new Window(GAME_TITLE, GAME_DIMENSION.width, GAME_DIMENSION.height, this);
@@ -141,6 +155,14 @@ public class Game extends Canvas implements Runnable {
         objectHandler.getGameObjects().forEach(AbstractGameObject::onTick);
     }
 
+    public void onEvent(Event event) {
+        if (event instanceof SettingChangeEvent) {
+            if (((SettingChangeEvent) event).getTarget() == stageSetting) {
+                backgroundFile = backgroundMap.get(((SettingChangeEvent) event).getDstString());
+            }
+        }
+    }
+
     private void onRender() {
         BufferStrategy bufferStrategy = this.getBufferStrategy();
         if (bufferStrategy == null) {
@@ -150,7 +172,7 @@ public class Game extends Canvas implements Runnable {
 
         Graphics graphics = bufferStrategy.getDrawGraphics();
         try {
-            renderer.img(graphics,ImageIO.read(new File("resources\\hintergrund 1.gif")), 0, 0, GAME_DIMENSION.width, GAME_DIMENSION.height);
+            renderer.img(graphics, ImageIO.read(backgroundFile), 0, 0, GAME_DIMENSION.width, GAME_DIMENSION.height);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -193,5 +215,9 @@ public class Game extends Canvas implements Runnable {
 
     public boolean isFocused() {
         return window.isFocused();
+    }
+
+    public Map<String, File> getBackgroundMap() {
+        return backgroundMap;
     }
 }

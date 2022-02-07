@@ -1,6 +1,7 @@
 package de.itg.wahlkampf.object.players;
 
 import de.itg.wahlkampf.object.AbstractPlayerObject;
+import de.itg.wahlkampf.utilities.sound.Sound;
 
 import java.awt.event.KeyEvent;
 
@@ -30,6 +31,10 @@ public class Player extends AbstractPlayerObject {
 
     @Override
     public void attack(AbstractPlayerObject enemy) {
+        Thread t = new Thread(() -> {
+            getSoundHelper().playMusic(Sound.HIT.getPath());
+        });
+        t.start();
 
     }
 }

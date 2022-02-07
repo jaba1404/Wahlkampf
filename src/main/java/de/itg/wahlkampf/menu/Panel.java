@@ -3,8 +3,10 @@ package de.itg.wahlkampf.menu;
 import de.itg.wahlkampf.Game;
 import de.itg.wahlkampf.menu.element.Element;
 import de.itg.wahlkampf.menu.element.elements.ElementCheckBox;
+import de.itg.wahlkampf.menu.element.elements.ElementComboBox;
 import de.itg.wahlkampf.menu.element.elements.ElementSlider;
 import de.itg.wahlkampf.setting.settings.SettingCheckBox;
+import de.itg.wahlkampf.setting.settings.SettingComboBox;
 import de.itg.wahlkampf.setting.settings.SettingSlider;
 import de.itg.wahlkampf.utilities.Font;
 import de.itg.wahlkampf.utilities.Renderer;
@@ -108,6 +110,9 @@ public class Panel {
             }
             if (setting instanceof SettingSlider) {
                 elements.add(new ElementSlider(this, (SettingSlider) setting));
+            }
+            if (setting instanceof SettingComboBox) {
+                elements.add(new ElementComboBox(this, (SettingComboBox) setting));
             }
         });
     }

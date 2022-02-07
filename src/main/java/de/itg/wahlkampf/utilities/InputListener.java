@@ -30,7 +30,7 @@ public class InputListener extends KeyAdapter {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        KEY_LIST.removeIf(integer -> integer.equals(e.getKeyCode()));
+        KEY_LIST.removeIf(integer -> integer == e.getKeyCode());
         game.getObjectHandler().getGameObjects().stream().filter(PLAYER_OBJECT_PREDICATE).forEach(gameObject -> gameObject.keyReleased(e));
         super.keyReleased(e);
     }
