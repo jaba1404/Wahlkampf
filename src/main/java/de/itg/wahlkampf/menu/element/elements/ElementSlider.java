@@ -13,7 +13,7 @@ public class ElementSlider extends Element {
     private final SettingSlider settingSlider;
     private final MathHelper mathHelper;
     private boolean dragging;
-    private final de.itg.wahlkampf.utilities.Font textFont = new de.itg.wahlkampf.utilities.Font("Roboto", Font.BOLD, 14);
+    private final Font textFont = new Font("Roboto", Font.BOLD, 14);
 
     public ElementSlider(Panel panel, SettingSlider settingSlider) {
         super(panel);

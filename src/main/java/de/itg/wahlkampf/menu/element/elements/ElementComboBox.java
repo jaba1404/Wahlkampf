@@ -11,7 +11,7 @@ import java.awt.*;
 public class ElementComboBox extends Element {
     private final SettingComboBox settingComboBox;
     private boolean extended;
-    private final Font textFont = new de.itg.wahlkampf.utilities.Font("Roboto", Font.BOLD, 14);
+    private final Font textFont = new Font("Roboto", Font.BOLD, 14);
     private final int originalHeight = 10;
     private final int distance = 15;
 
