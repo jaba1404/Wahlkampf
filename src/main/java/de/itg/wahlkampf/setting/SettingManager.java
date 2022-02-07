@@ -1,6 +1,7 @@
 package de.itg.wahlkampf.setting;
 
 import de.itg.wahlkampf.setting.settings.SettingCheckBox;
+import de.itg.wahlkampf.setting.settings.SettingSlider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +11,11 @@ public class SettingManager {
 
     public SettingManager() {
         settingList.add(new SettingCheckBox("Test 1", false));
-        settingList.add(new SettingCheckBox("Start Game", false,false));
-        settingList.add(new SettingCheckBox("Pause Game", false,false));
+        settingList.add(new SettingCheckBox("Start Game", false, false));
+        settingList.add(new SettingCheckBox("Pause Game", false, false));
         settingList.add(new SettingCheckBox("Test 2", true));
+        settingList.add(new SettingSlider("Test 2", 1, 10, 5, 0.5, true));
+
 
     }
 

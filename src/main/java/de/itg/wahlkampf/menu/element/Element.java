@@ -1,16 +1,20 @@
 package de.itg.wahlkampf.menu.element;
 
+import de.itg.wahlkampf.Game;
 import de.itg.wahlkampf.menu.Panel;
 import de.itg.wahlkampf.setting.Setting;
+import de.itg.wahlkampf.utilities.Renderer;
 
 import java.awt.*;
 
 public abstract class Element {
+    private final Renderer renderer;
     private final Panel panel;
     private int x,y;
 
     public Element(Panel panel) {
         this.panel = panel;
+        renderer = Game.instance.getRenderer();
     }
 
     public void drawScreen(Graphics graphics, int x, int y, int mouseX, int mouseY) {
@@ -24,6 +28,8 @@ public abstract class Element {
     public abstract void drawScreen(Graphics graphics, int mouseX, int mouseY);
 
     public abstract void mouseClicked(int mouseX, int mouseY, int mouseButton);
+
+    public abstract void mousePressed(int mouseX, int mouseY, int mouseButton);
 
     public abstract void mouseReleased(int mouseX, int mouseY);
 
@@ -45,5 +51,9 @@ public abstract class Element {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    public Renderer getRenderer() {
+        return renderer;
     }
 }

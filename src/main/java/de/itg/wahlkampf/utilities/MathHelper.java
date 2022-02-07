@@ -28,14 +28,19 @@ public class MathHelper {
         return RANDOM.nextFloat() * (max - min) + min;
     }
 
+    public float getRounded(float value, float accuracy) {
+        final float factor = 1 / accuracy;
+        return Math.round(value * factor) / factor;
+    }
+
     public float getDistanceTo(AbstractGameObject from, AbstractGameObject to) {
         final float xDelta = from.getPositionX() - to.getPositionX();
         final float yDelta = from.getPositionY() - to.getPositionY();
 
         return (float) Math.sqrt(Math.pow(xDelta, 2) + Math.pow(yDelta, 2));
     }
-    public int interpolateValue(int start, int end, int pct)
-    {
+
+    public int interpolateValue(int start, int end, int pct) {
         return start + (end - start) * pct;
     }
 }

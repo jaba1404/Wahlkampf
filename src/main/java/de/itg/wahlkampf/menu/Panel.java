@@ -3,7 +3,9 @@ package de.itg.wahlkampf.menu;
 import de.itg.wahlkampf.Game;
 import de.itg.wahlkampf.menu.element.Element;
 import de.itg.wahlkampf.menu.element.elements.ElementCheckBox;
+import de.itg.wahlkampf.menu.element.elements.ElementSlider;
 import de.itg.wahlkampf.setting.settings.SettingCheckBox;
+import de.itg.wahlkampf.setting.settings.SettingSlider;
 import de.itg.wahlkampf.utilities.Font;
 import de.itg.wahlkampf.utilities.Renderer;
 
@@ -70,8 +72,13 @@ public class Panel {
     }
 
     public void mousePressed(int mouseX, int mouseY, int mouseButton) {
-        if(!isVisible)
+        if (!isVisible)
             return;
+        if (extended) {
+            for (Element element : elements) {
+                element.mousePressed(mouseX, mouseY, mouseButton);
+            }
+        }
         if (mouseX >= x && mouseX < x + getWidth() && mouseY >= y && mouseY < y + getHeight()) {
             if (mouseButton == 1) {
 
@@ -98,6 +105,9 @@ public class Panel {
         Game.instance.getSettingManager().getSettingList().forEach(setting -> {
             if (setting instanceof SettingCheckBox) {
                 elements.add(new ElementCheckBox(this, (SettingCheckBox) setting));
+            }
+            if (setting instanceof SettingSlider) {
+                elements.add(new ElementSlider(this, (SettingSlider) setting));
             }
         });
     }
