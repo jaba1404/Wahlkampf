@@ -2,17 +2,17 @@ package de.itg.wahlkampf.menu.element;
 
 import de.itg.wahlkampf.Game;
 import de.itg.wahlkampf.menu.Panel;
-import de.itg.wahlkampf.setting.Setting;
+import de.itg.wahlkampf.setting.AbstractSetting;
 import de.itg.wahlkampf.utilities.Renderer;
 
 import java.awt.*;
 
-public abstract class Element {
+public abstract class AbstractElement {
     private final Renderer renderer;
     private final Panel panel;
     private int x,y;
 
-    public Element(Panel panel) {
+    public AbstractElement(Panel panel) {
         this.panel = panel;
         renderer = Game.instance.getRenderer();
     }
@@ -35,7 +35,7 @@ public abstract class Element {
 
     public abstract int getHeight();
 
-    public abstract Setting getSetting();
+    public abstract AbstractSetting getSetting();
 
     public int getX() {
         return x;

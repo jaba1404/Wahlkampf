@@ -1,14 +1,14 @@
 package de.itg.wahlkampf.menu.element.elements;
 
 import de.itg.wahlkampf.menu.Panel;
-import de.itg.wahlkampf.menu.element.Element;
+import de.itg.wahlkampf.menu.element.AbstractElement;
 import de.itg.wahlkampf.setting.settings.SettingCheckBox;
 import de.itg.wahlkampf.utilities.Font;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
-public class ElementCheckBox extends Element {
+public class ElementCheckBox extends AbstractElement {
     private final SettingCheckBox setting;
     private final int width = 100;
     private final Font textFont = new Font("Roboto", Font.BOLD, 14);

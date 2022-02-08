@@ -1,7 +1,7 @@
 package de.itg.wahlkampf.menu;
 
 import de.itg.wahlkampf.Game;
-import de.itg.wahlkampf.menu.element.Element;
+import de.itg.wahlkampf.menu.element.AbstractElement;
 import de.itg.wahlkampf.menu.element.elements.ElementCheckBox;
 import de.itg.wahlkampf.menu.element.elements.ElementComboBox;
 import de.itg.wahlkampf.menu.element.elements.ElementSlider;
@@ -21,7 +21,7 @@ public class Panel {
     private boolean dragging, extended;
     private final Font panelFont = new Font("Roboto", Font.BOLD, 16);
     private final Renderer renderer;
-    private final List<Element> elements = new ArrayList<>();
+    private final List<AbstractElement> elements = new ArrayList<>();
     private int width = 200;
     private int height = 20;
     private boolean isVisible;
@@ -46,7 +46,7 @@ public class Panel {
         if (extended) {
             renderer.drawFillRectangle(graphics, getX(), y + getHeight() - 1, getWidth(), 1, Color.WHITE);
             int y = getY() + getHeight();
-            for (Element element : elements) {
+            for (AbstractElement element : elements) {
                 element.drawScreen(graphics, getX(), y, mouseX, mouseY);
                 y += element.getHeight();
             }
@@ -62,7 +62,7 @@ public class Panel {
             }
         }
         if (extended) {
-            for (Element element : elements) {
+            for (AbstractElement element : elements) {
                 element.mouseClicked(mouseX, mouseY, mouseButton);
             }
         }
@@ -77,7 +77,7 @@ public class Panel {
         if (!isVisible)
             return;
         if (extended) {
-            for (Element element : elements) {
+            for (AbstractElement element : elements) {
                 element.mousePressed(mouseX, mouseY, mouseButton);
             }
         }
@@ -96,7 +96,7 @@ public class Panel {
             return;
         dragging = false;
         if (extended) {
-            for (Element element : elements) {
+            for (AbstractElement element : elements) {
                 element.mouseReleased(mouseX, mouseY);
             }
         }

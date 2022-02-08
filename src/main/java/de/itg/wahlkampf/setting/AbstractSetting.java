@@ -1,30 +1,30 @@
 package de.itg.wahlkampf.setting;
 
-public abstract class Setting {
+public abstract class AbstractSetting {
 
     private final String name;
     private final String settingToShow;
     private boolean showInOptions;
 
-    public Setting(String name) {
+    public AbstractSetting(String name) {
         this.name = name;
         this.showInOptions = true;
         this.settingToShow = null;
     }
 
-    public Setting(String name, boolean showInOptions) {
+    public AbstractSetting(String name, boolean showInOptions) {
         this.name = name;
         this.showInOptions = showInOptions;
         this.settingToShow = null;
     }
 
-    public Setting(String name, String settingToShow) {
+    public AbstractSetting(String name, String settingToShow) {
         this.name = name;
         this.showInOptions = true;
         this.settingToShow = settingToShow;
     }
 
-    public Setting(String name, boolean showInOptions, String settingToShow) {
+    public AbstractSetting(String name, boolean showInOptions, String settingToShow) {
         this.name = name;
         this.showInOptions = showInOptions;
         this.settingToShow = settingToShow;
@@ -57,7 +57,7 @@ public abstract class Setting {
         return true;
     }
 
-    public Setting getSetting() {
+    public AbstractSetting getSetting() {
         return this;
     }
 

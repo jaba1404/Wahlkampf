@@ -16,17 +16,23 @@ import java.io.IOException;
 
 public abstract class AbstractPlayerObject extends AbstractGameObject {
 
+    private static final int INITIAL_LIVES = 3;
+    private static final int MAX_AIR_JUMPS = 3;
+    private static final int FLIP_VERTICAL = 1;
+    private static final int FLIP_HORIZONTAL = -1;
+
     private final Movement movement;
     private final MathHelper mathHelper;
     private boolean onGround;
     private boolean jump;
+    private boolean attack;
+    private boolean clip;
     private int weight;
     private String path;
     private int healthPoints;
-    private int lives = 3;
-    private int jumpHeight;
+    private int lives = INITIAL_LIVES;
     private final SoundHelper soundHelper;
-    private int id;
+    private final int id;
     private Direction facing = Direction.RIGHT;
     private BufferedImage bufferedImage;
     private BufferedImage bufferedImageFlipH;
@@ -34,8 +40,9 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     private final Renderer renderer;
     private AbstractPlayerObject lastDamageSource;
     private final int spawnX, spawnY, spawnHealth;
-    private static final int FLIP_VERTICAL = 1;
-    private static final int FLIP_HORIZONTAL = -1;
+    private int verticalMotion;
+    private int horizontalMotion;
+    private int jumpCounter;
 
     public AbstractPlayerObject(String name, String path, int id, int healthPoints, int weight, int positionX, int positionY, int width, int height) {
         super(name, Type.PLAYER, positionX, positionY, width, height, true);
@@ -65,14 +72,44 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         final BufferedImage player = facing == Direction.RIGHT ? bufferedImage : bufferedImageFlipH;
         renderer.img(graphics, player, getPositionX(), getPositionY(), getWidth(), getHeight());
         renderer.drawCircle(graphics, getPositionX(), getEyePosY(), 5, 5, Color.RED);
-
     }
 
     public void controlPlayer() {
-        collide();
-        if (!isOnGround() && jump) {
-            fall(1.005f);
+        if(getPositionY() > 0) {
+            setPositionY(getPositionY() - verticalMotion);
         }
+        setPositionX(getPositionX() + horizontalMotion);
+
+        if (!isOnGround()) {
+            if(getPositionY() > 0) {
+                verticalMotion *= 0.91;
+                verticalMotion -= 2;
+            }else{
+                verticalMotion = 0;
+                setPositionY(1);
+            }
+        } else if (verticalMotion < 0) {
+            verticalMotion = 0;
+        }
+
+        if (Math.abs(horizontalMotion) >= 1) {
+            horizontalMotion -= facing.getHorizontalFactor();
+        }
+
+        collide();
+
+        if (isOnGround()) {
+            jumpCounter = 0;
+        }
+
+        if (!InputListener.KEY_LIST.contains(KeyEvent.VK_X) && !InputListener.KEY_LIST.contains(KeyEvent.VK_X)) {
+            attack = true;
+        }
+
+        if (!InputListener.KEY_LIST.contains(KeyEvent.VK_S) && !InputListener.KEY_LIST.contains(KeyEvent.VK_DOWN)) {
+            clip = true;
+        }
+
         if (!InputListener.KEY_LIST.contains(KeyEvent.VK_SPACE) && !InputListener.KEY_LIST.contains(KeyEvent.VK_SHIFT))
             jump = true;
         switch (id) {
@@ -81,19 +118,27 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
                     switch (integer) {
                         //case KeyEvent.VK_W -> facing = Direction.UP;
                         case KeyEvent.VK_S -> {
-                            final AbstractGameObject gameObject = getObjectStandingOn();
-                            if (gameObject != null && gameObject.isPassThrough()) {
-                                setPositionY(getPositionY() + getHeight() / 2 + getObjectStandingOn().getHeight());
+                            if(clip) {
+                                final AbstractGameObject gameObject = getObjectStandingOn();
+                                if (gameObject != null && gameObject.isPassThrough()) {
+                                    setPositionY(getPositionY() + getHeight() / 2 + getObjectStandingOn().getHeight() / 2);
+                                }
+                                clip = false;
                             }
                         }
-                        case KeyEvent.VK_X -> attack(getRayTrace(10, Direction.RIGHT));
+                        case KeyEvent.VK_X -> {
+                            if (attack) {
+                                attack(getRayTrace(100, Direction.RIGHT));
+                                attack = false;
+                            }
+                        }
                         case KeyEvent.VK_A -> move(Direction.LEFT);
                         case KeyEvent.VK_D -> move(Direction.RIGHT);
                         case KeyEvent.VK_SPACE -> {
-                            if (jump) {
-                                int height = 60;
-                                jump(60);
+                            if (jump && ++jumpCounter <= MAX_AIR_JUMPS) {
+                                verticalMotion = 30;
                                 jump = false;
+                                horizontalMotion += 2 * facing.getHorizontalFactor();
                             }
                         }
                     }
@@ -112,8 +157,8 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
                         case KeyEvent.VK_LEFT -> move(Direction.LEFT);
                         case KeyEvent.VK_RIGHT -> move(Direction.RIGHT);
                         case KeyEvent.VK_SHIFT -> {
-                            if (jump) {
-                                jump(60);
+                            if (jump && ++jumpCounter <= MAX_AIR_JUMPS) {
+                                verticalMotion = 30;
                                 jump = false;
                             }
                         }
@@ -189,10 +234,15 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     }
 
     public void move(Direction direction) {
-        movement.move(this, direction);
-        if (direction != Direction.UP && direction != Direction.DOWN) {
+        //movement.move(this, direction);
+        if (direction.getHorizontalFactor() != 0) {
             this.facing = direction;
         }
+
+        horizontalMotion += 2 * facing.getHorizontalFactor();
+        horizontalMotion *= 1.2;
+        horizontalMotion = Math.min(5, horizontalMotion);
+        horizontalMotion = Math.max(-5, horizontalMotion);
     }
 
     private BufferedImage flip(BufferedImage image, int direction) {
@@ -213,10 +263,6 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
 
     public void jump(int height) {
         movement.jump(this, height);
-    }
-
-    public void fall(float multiplier) {
-        movement.fall(this, multiplier);
     }
 
     public boolean isOnGround() {
@@ -264,5 +310,21 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     public int calculateKnockBack(int percentage, int damage, int weight, int knockBackScaling, int baseKnockBack,
                                   int ratio) {
         return (int) (((((((percentage / 10) + (percentage * damage) / 20) * (200 / (weight + 100)) * 1.4) + 18) * knockBackScaling) + baseKnockBack) * ratio);
+    }
+
+    public void setHorizontalMotion(int horizontalMotion) {
+        this.horizontalMotion = horizontalMotion;
+    }
+
+    public int getHorizontalMotion() {
+        return horizontalMotion;
+    }
+
+    public int getVerticalMotion() {
+        return verticalMotion;
+    }
+
+    public void setVerticalMotion(int verticalMotion) {
+        this.verticalMotion = verticalMotion;
     }
 }

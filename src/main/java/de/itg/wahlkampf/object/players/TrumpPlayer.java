@@ -30,8 +30,11 @@ public class TrumpPlayer extends AbstractPlayerObject {
 
     @Override
     public void attack(AbstractPlayerObject enemy) {
-        if (enemy != null)
+        if (enemy != null) {
             enemy.addDamage(5, this);
+
+            enemy.setVerticalMotion(enemy.getVerticalMotion() + 30);
+        }
 
     }
 }

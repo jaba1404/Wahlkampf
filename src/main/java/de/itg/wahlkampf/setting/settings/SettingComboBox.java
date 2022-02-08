@@ -2,13 +2,13 @@ package de.itg.wahlkampf.setting.settings;
 
 import de.itg.wahlkampf.Game;
 import de.itg.wahlkampf.event.impl.SettingChangeEvent;
-import de.itg.wahlkampf.setting.Setting;
+import de.itg.wahlkampf.setting.AbstractSetting;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SettingComboBox extends Setting {
+public class SettingComboBox extends AbstractSetting {
 
     private final List<String> options = new ArrayList<>();
     private String currentOption;
@@ -33,11 +33,11 @@ public class SettingComboBox extends Setting {
 
     @Override
     public boolean check(boolean needToBeActive, String settingToShow) {
-        final Setting settingSimple = Game.instance.getSettingManager().getSettingByName(settingToShow);
+        final AbstractSetting settingSimple = Game.instance.getSettingManager().getSettingByName(settingToShow);
         if (settingSimple instanceof final SettingCheckBox settingCheckBox) {
             return needToBeActive ? settingCheckBox.isActive() && settingSimple.canRender() : !settingCheckBox.isActive();
         } else {
-            for (Setting setting : Game.instance.getSettingManager().getSettingList()) {
+            for (AbstractSetting setting : Game.instance.getSettingManager().getSettingList()) {
                 if (setting instanceof SettingComboBox settingComboBox) {
                     if (settingComboBox.optionsContains(settingToShow)) {
                         boolean show = settingComboBox.getCurrentOption().equalsIgnoreCase(settingToShow);

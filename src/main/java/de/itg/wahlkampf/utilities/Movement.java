@@ -20,8 +20,4 @@ public class Movement {
         object.setPositionY(mathHelper.interpolateValue(object.getPositionY(),object.getPositionY() - height,1));
     }
 
-    public void fall(AbstractGameObject gameObject, float multiplier) {
-        gameObject.setPositionY((int) ((gameObject.getPositionY() + SPEED) * multiplier));
-    }
-
 }

@@ -1,15 +1,15 @@
 package de.itg.wahlkampf.menu.element.elements;
 
 import de.itg.wahlkampf.menu.Panel;
-import de.itg.wahlkampf.menu.element.Element;
-import de.itg.wahlkampf.setting.Setting;
+import de.itg.wahlkampf.menu.element.AbstractElement;
+import de.itg.wahlkampf.setting.AbstractSetting;
 import de.itg.wahlkampf.setting.settings.SettingSlider;
 import de.itg.wahlkampf.utilities.Font;
 import de.itg.wahlkampf.utilities.MathHelper;
 
 import java.awt.*;
 
-public class ElementSlider extends Element {
+public class ElementSlider extends AbstractElement {
     private final SettingSlider settingSlider;
     private final MathHelper mathHelper;
     private boolean dragging;
@@ -63,7 +63,7 @@ public class ElementSlider extends Element {
     }
 
     @Override
-    public Setting getSetting() {
+    public AbstractSetting getSetting() {
         return settingSlider;
     }
 

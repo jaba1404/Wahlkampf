@@ -1,9 +1,9 @@
 package de.itg.wahlkampf.setting.settings;
 
 import de.itg.wahlkampf.Game;
-import de.itg.wahlkampf.setting.Setting;
+import de.itg.wahlkampf.setting.AbstractSetting;
 
-public class SettingCheckBox extends Setting {
+public class SettingCheckBox extends AbstractSetting {
     private boolean active;
 
     public SettingCheckBox(String name, boolean showInOptions, boolean active) {
@@ -28,7 +28,7 @@ public class SettingCheckBox extends Setting {
 
     @Override
     public boolean check(boolean needToBeActive, String settingToShow) {
-        final Setting settingSimple = Game.instance.getSettingManager().getSettingByName(settingToShow);
+        final AbstractSetting settingSimple = Game.instance.getSettingManager().getSettingByName(settingToShow);
         if (settingSimple instanceof final SettingCheckBox settingCheckBox) {
             return needToBeActive ? settingCheckBox.isActive() && settingSimple.canRender() : !settingCheckBox.isActive();
         }

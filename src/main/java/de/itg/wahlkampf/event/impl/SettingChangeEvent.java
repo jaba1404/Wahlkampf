@@ -1,38 +1,38 @@
 package de.itg.wahlkampf.event.impl;
 
 import de.itg.wahlkampf.event.Event;
-import de.itg.wahlkampf.setting.Setting;
+import de.itg.wahlkampf.setting.AbstractSetting;
 
 public class SettingChangeEvent extends Event {
 
-    private final Setting target;
+    private final AbstractSetting target;
     private boolean srcBoolean, dstBoolean;
     private float srcFloat, dstFloat;
     private String srcString, dstString;
 
-    public SettingChangeEvent(Setting target) {
+    public SettingChangeEvent(AbstractSetting target) {
         this.target = target;
     }
 
-    public SettingChangeEvent(Setting target, boolean srcBoolean, boolean dstBoolean) {
+    public SettingChangeEvent(AbstractSetting target, boolean srcBoolean, boolean dstBoolean) {
         this.target = target;
         this.srcBoolean = srcBoolean;
         this.dstBoolean = dstBoolean;
     }
 
-    public SettingChangeEvent(Setting target, float srcFloat, float dstFloat) {
+    public SettingChangeEvent(AbstractSetting target, float srcFloat, float dstFloat) {
         this.target = target;
         this.srcFloat = srcFloat;
         this.dstFloat = dstFloat;
     }
 
-    public SettingChangeEvent(Setting target, String srcString, String dstString) {
+    public SettingChangeEvent(AbstractSetting target, String srcString, String dstString) {
         this.target = target;
         this.srcString = srcString;
         this.dstString = dstString;
     }
 
-    public Setting getTarget() {
+    public AbstractSetting getTarget() {
         return target;
     }
 

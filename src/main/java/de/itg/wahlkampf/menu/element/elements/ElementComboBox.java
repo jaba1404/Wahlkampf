@@ -1,14 +1,14 @@
 package de.itg.wahlkampf.menu.element.elements;
 
 import de.itg.wahlkampf.menu.Panel;
-import de.itg.wahlkampf.menu.element.Element;
-import de.itg.wahlkampf.setting.Setting;
+import de.itg.wahlkampf.menu.element.AbstractElement;
+import de.itg.wahlkampf.setting.AbstractSetting;
 import de.itg.wahlkampf.setting.settings.SettingComboBox;
 import de.itg.wahlkampf.utilities.Font;
 
 import java.awt.*;
 
-public class ElementComboBox extends Element {
+public class ElementComboBox extends AbstractElement {
     private final SettingComboBox settingComboBox;
     private boolean extended;
     private final Font textFont = new Font("Roboto", Font.BOLD, 14);
@@ -77,7 +77,7 @@ public class ElementComboBox extends Element {
     }
 
     @Override
-    public Setting getSetting() {
+    public AbstractSetting getSetting() {
         return settingComboBox;
     }
 }

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SettingManager {
-    private final List<Setting> settingList = new ArrayList<>();
+    private final List<AbstractSetting> settingList = new ArrayList<>();
 
     public SettingManager() {
         settingList.add(new SettingCheckBox("Test 1", false));
@@ -23,11 +23,11 @@ public class SettingManager {
         settingList.add(new SettingSlider("Test 2", 1, 10, 5, 0.5, true));
     }
 
-    public Setting getSettingByName(String name) {
+    public AbstractSetting getSettingByName(String name) {
         return settingList.stream().filter(setting -> setting.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
-    public List<Setting> getSettingList() {
+    public List<AbstractSetting> getSettingList() {
         return settingList;
     }
 }
