@@ -1,9 +1,12 @@
 package de.itg.wahlkampf;
 
 import de.itg.wahlkampf.event.Event;
+import de.itg.wahlkampf.event.impl.GameFinishedEvent;
 import de.itg.wahlkampf.event.impl.SettingChangeEvent;
-import de.itg.wahlkampf.menu.Menu;
+import de.itg.wahlkampf.menu.menus.FinishedMenu;
+import de.itg.wahlkampf.menu.menus.MainMenu;
 import de.itg.wahlkampf.object.AbstractGameObject;
+import de.itg.wahlkampf.object.AbstractPlayerObject;
 import de.itg.wahlkampf.object.ObjectHandler;
 import de.itg.wahlkampf.object.Type;
 import de.itg.wahlkampf.setting.SettingManager;
@@ -19,9 +22,10 @@ import de.itg.wahlkampf.utilities.particlesystem.ParticleHandler;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,18 +38,20 @@ public class Game extends Canvas implements Runnable {
     private static final double UPDATE_CAP = 1.0 / 60.0;
     public static Game instance;
 
+    private final List<String> playerNames = new ArrayList<>();
     private final ObjectHandler objectHandler;
-    private final ImageHelper imageHelper;
     private final Window window;
     private final Renderer renderer;
     private final ParticleHandler particleHandler;
     private final SettingManager settingManager;
-    private final Menu menu;
+    private MainMenu menu;
+    private int playerAmount = 2;
+
+    private FinishedMenu finishedMenu;
     private boolean running;
     private Thread thread;
     private final SettingCheckBox startGame;
     private final SettingComboBox stageSetting;
-    private final List<BufferedImage> bufferedImages;
     private final Map<String, File> backgroundMap;
     private File backgroundFile;
 
@@ -54,12 +60,13 @@ public class Game extends Canvas implements Runnable {
 
     public Game() {
         instance = this;
-        imageHelper = new ImageHelper();
-        bufferedImages = imageHelper.getFrames(new File("resources\\9BC613A2-35B0-488D-B6AC-E217003CA6C8.gif"));
+        ImageHelper imageHelper = new ImageHelper();
         backgroundMap = Stream.of(new Object[][]{
                 {"White House", new File("resources\\hintergrund 1.gif")},
                 {"Red Arena", new File("resources\\9BC613A2-35B0-488D-B6AC-E217003CA6C8.gif")},
         }).collect(Collectors.toMap(data -> (String) data[0], data -> (File) data[1]));
+        playerNames.addAll(Arrays.asList("Trump", "Merkel"));
+        playerNames.add("None");
         settingManager = new SettingManager();
         startGame = (SettingCheckBox) settingManager.getSettingByName("Start Game");
         stageSetting = (SettingComboBox) settingManager.getSettingByName("Stage");
@@ -68,9 +75,12 @@ public class Game extends Canvas implements Runnable {
         renderer = new Renderer();
         this.addKeyListener(new InputListener(this));
         window = new Window(GAME_TITLE, GAME_DIMENSION.width, GAME_DIMENSION.height, this);
-        menu = new Menu();
+        menu = new MainMenu();
+        finishedMenu = new FinishedMenu();
         this.addMouseListener(menu);
         this.addMouseMotionListener(menu);
+        addMouseListener(finishedMenu);
+        addMouseMotionListener(finishedMenu);
         objectHandler = new ObjectHandler();
         particleHandler = new ParticleHandler();
     }
@@ -161,6 +171,12 @@ public class Game extends Canvas implements Runnable {
                 backgroundFile = backgroundMap.get(((SettingChangeEvent) event).getDstString());
             }
         }
+        if (event instanceof GameFinishedEvent) {
+            if (finishedMenu.getAbstractPlayerObject() == null) {
+                finishedMenu.setAbstractPlayerObject((AbstractPlayerObject) ((GameFinishedEvent) event).getWinner());
+                finishedMenu.setVisible(true);
+            }
+        }
     }
 
     private void onRender() {
@@ -179,8 +195,10 @@ public class Game extends Canvas implements Runnable {
 
         renderer.textWithShadow(graphics, GAME_TITLE, 1, 10, Color.white, textFont);
         renderer.textWithShadow(graphics, "FPS: " + framesPerSecond, 1, 25, Color.white, textFont);
-        menu.drawScreen(graphics);
 
+        if (menu != null) {
+            menu.drawScreen(graphics);
+        }
 
         if (objectHandler == null)
             return;
@@ -188,14 +206,17 @@ public class Game extends Canvas implements Runnable {
             for (AbstractGameObject gameObject : objectHandler.getGameObjects()) {
                 gameObject.onRender(graphics);
                 if (gameObject.getType() == Type.PLAYER) {
-                    renderer.textWithShadow(graphics, gameObject.getName(), gameObject.getPositionX(), gameObject.getPositionY(), Color.WHITE, textFont);
+                    renderer.textWithShadow(graphics, gameObject.getName() + " hp: " + ((AbstractPlayerObject) gameObject).getHealthPoints(), gameObject.getPositionX(), gameObject.getPositionY(), Color.WHITE, textFont);
                 }
             }
+            menu = null;
         }
         for (AbstractParticle particle : particleHandler.getParticleList()) {
             particle.drawParticle(graphics);
         }
-
+        if (finishedMenu.isVisible()) {
+            finishedMenu.drawScreen(graphics);
+        }
         graphics.dispose();
 
         bufferStrategy.show();
@@ -215,6 +236,14 @@ public class Game extends Canvas implements Runnable {
 
     public boolean isFocused() {
         return window.isFocused();
+    }
+
+    public List<String> getPlayerNames() {
+        return playerNames;
+    }
+
+    public int getPlayerAmount() {
+        return playerAmount;
     }
 
     public Map<String, File> getBackgroundMap() {

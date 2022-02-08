@@ -4,9 +4,9 @@ import de.itg.wahlkampf.object.AbstractPlayerObject;
 
 import java.awt.event.KeyEvent;
 
-public class TestPlayer extends AbstractPlayerObject {
-    public TestPlayer(int id) {
-        super("Test Player", "resources\\Merkel.png", id, 50, 180, 10, 21, 53);
+public class MerkelPlayer extends AbstractPlayerObject {
+    public MerkelPlayer(int id) {
+        super("Merkel", "resources\\Merkel.png", id, 1000, 50, 180, 50, 21, 53);
     }
 //214 höhe 86 breite
 

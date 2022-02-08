@@ -2,8 +2,8 @@ package de.itg.wahlkampf.object;
 
 import de.itg.wahlkampf.Game;
 import de.itg.wahlkampf.object.objects.StageBlock;
-import de.itg.wahlkampf.object.players.Player;
-import de.itg.wahlkampf.object.players.TestPlayer;
+import de.itg.wahlkampf.object.players.MerkelPlayer;
+import de.itg.wahlkampf.object.players.TrumpPlayer;
 import de.itg.wahlkampf.utilities.MathHelper;
 
 import javax.imageio.ImageIO;
@@ -36,9 +36,16 @@ public class ObjectHandler {
             x += mathHelper.getRandomInt(width, width + 200);
         }
         addObject(new StageBlock(0, 660, Game.instance.getWidth(), 30, new Color(0, 0, 0, 0), false));
-        addObject(new Player(0));
-        addObject(new TestPlayer(1));
+    }
 
+    public void addPlayerObjects(String[] players) {
+        for (int i = 0; i < players.length; i++) {
+            final String s = players[i];
+            switch (s) {
+                case "Merkel" -> addObject(new MerkelPlayer(i));
+                case "Trump" -> addObject(new TrumpPlayer(i));
+            }
+        }
     }
 
     public ArrayList<AbstractGameObject> getGameObjects() {

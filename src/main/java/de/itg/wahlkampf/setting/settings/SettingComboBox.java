@@ -59,7 +59,7 @@ public class SettingComboBox extends Setting {
 
     public void setCurrentOption(String currentOption) {
         if (!currentOption.equalsIgnoreCase(this.currentOption)) {
-            SettingChangeEvent event = new SettingChangeEvent(this, this.currentOption, currentOption);
+           final SettingChangeEvent event = new SettingChangeEvent(this, this.currentOption, currentOption);
             Game.instance.onEvent(event);
             if (!event.isCancelled()) {
                 this.currentOption = currentOption;

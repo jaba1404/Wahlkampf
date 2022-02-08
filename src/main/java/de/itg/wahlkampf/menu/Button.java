@@ -5,10 +5,6 @@ import de.itg.wahlkampf.utilities.Font;
 import de.itg.wahlkampf.utilities.Renderer;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
 public class Button {
@@ -31,21 +27,23 @@ public class Button {
         buttonFont = new Font("Roboto", Font.BOLD, fontSize);
     }
 
-    protected void drawScreen(Graphics graphics, int mouseX, int mouseY) {
+    public void drawScreen(Graphics graphics, int mouseX, int mouseY) {
         renderer.drawFillRectangle(graphics, x, y, width, height, new Color(255, 255, 255, 100));
         final Rectangle2D fontSize = buttonFont.getStringSize(getText());
         renderer.textWithShadow(graphics, text, x + (width - (int) fontSize.getWidth()) / 2, y + (height + (int) fontSize.getHeight() / 2) / 2, enabled ? new Color(230, 230, 230, 255) : new Color(200, 200, 200, 255), buttonFont);
-        if(isHovered(mouseX,mouseY)) {
-            renderer.drawRectangle(graphics,x, y, width, height, new Color(255, 255, 255, 200));
+        if (isHovered(mouseX, mouseY)) {
+            renderer.drawRectangle(graphics, x, y, width, height, new Color(255, 255, 255, 200));
         }
     }
 
-    protected boolean isHovered(int mouseX, int mouseY) {
+    public boolean isHovered(int mouseX, int mouseY) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
-    protected boolean canClick(int mouseX, int mouseY) {
+
+    public boolean canClick(int mouseX, int mouseY) {
         return isHovered(mouseX, mouseY) && isVisible() && isEnabled();
     }
+
     public int getX() {
         return x;
     }

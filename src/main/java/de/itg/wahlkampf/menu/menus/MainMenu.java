@@ -1,15 +1,19 @@
-package de.itg.wahlkampf.menu;
+package de.itg.wahlkampf.menu.menus;
 
 import de.itg.wahlkampf.Game;
+import de.itg.wahlkampf.menu.Button;
+import de.itg.wahlkampf.menu.Panel;
 import de.itg.wahlkampf.setting.settings.SettingCheckBox;
+import de.itg.wahlkampf.setting.settings.SettingComboBox;
 import de.itg.wahlkampf.utilities.Font;
 import de.itg.wahlkampf.utilities.Renderer;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
-public class Menu extends MouseAdapter {
+public class MainMenu extends MouseAdapter {
     private final Button startButton;
     private final Button optionButton;
     private final Button quitButton;
@@ -21,8 +25,9 @@ public class Menu extends MouseAdapter {
     private final Font titleFont;
     private final Font versionFont;
     private final Renderer renderer;
+    final ArrayList<String> players = new ArrayList<>();
 
-    public Menu() {
+    public MainMenu() {
         final int x = (Game.instance.getSize().width - width) / 2;
         final int centerY = (Game.instance.getSize().height - height) / 2;
         startButton = new Button("StartButton", "Start Game", x, centerY - 60, width, height, 30, true, true);
@@ -54,6 +59,10 @@ public class Menu extends MouseAdapter {
         mouseY = e.getY();
         panel.mouseClicked(mouseX, mouseY, e.getButton());
         if (startButton.canClick(mouseX, mouseY)) {
+            for (int i = 0; i < Game.instance.getPlayerAmount(); i++) {
+                players.add(((SettingComboBox) Game.instance.getSettingManager().getSettingByName("Player " + i)).getCurrentOption());
+            }
+            Game.instance.getObjectHandler().addPlayerObjects(players.toArray(new String[0]));
             startGame.setActive(true);
         }
         if (optionButton.canClick(mouseX, mouseY)) {

@@ -57,6 +57,10 @@ public abstract class Setting {
         return true;
     }
 
+    public Setting getSetting() {
+        return this;
+    }
+
     public boolean isShowInOptions() {
         return showInOptions;
     }

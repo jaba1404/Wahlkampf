@@ -1,6 +1,7 @@
 package de.itg.wahlkampf.object;
 
 import de.itg.wahlkampf.Game;
+import de.itg.wahlkampf.event.impl.GameFinishedEvent;
 import de.itg.wahlkampf.object.boundingbox.AxisAligned;
 import de.itg.wahlkampf.utilities.*;
 import de.itg.wahlkampf.utilities.sound.SoundHelper;
@@ -21,7 +22,8 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     private boolean jump;
     private int weight;
     private String path;
-    private int damageAmount;
+    private int healthPoints;
+    private int lives = 3;
     private int jumpHeight;
     private final SoundHelper soundHelper;
     private int id;
@@ -30,26 +32,30 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     private BufferedImage bufferedImageFlipH;
     private BufferedImage bufferedImageFlipV;
     private final Renderer renderer;
-
+    private AbstractPlayerObject lastDamageSource;
+    private final int spawnX, spawnY, spawnHealth;
     private static final int FLIP_VERTICAL = 1;
     private static final int FLIP_HORIZONTAL = -1;
 
-    public AbstractPlayerObject(String name, String path, int id, int weight, int positionX, int positionY, int width, int height) {
+    public AbstractPlayerObject(String name, String path, int id, int healthPoints, int weight, int positionX, int positionY, int width, int height) {
         super(name, Type.PLAYER, positionX, positionY, width, height, true);
         this.id = id;
         this.path = path;
-        renderer = Game.instance.getRenderer();
-        movement = new Movement();
-        mathHelper = new MathHelper();
-        soundHelper = new SoundHelper();
+        this.healthPoints = healthPoints;
+        this.renderer = Game.instance.getRenderer();
+        this.movement = new Movement();
+        this.mathHelper = new MathHelper();
+        this.soundHelper = new SoundHelper();
+        this.spawnX = positionX;
+        this.spawnY = positionY;
+        this.spawnHealth = healthPoints;
         try {
-            bufferedImage = ImageIO.read(new File(path));
-            bufferedImageFlipH = flip(bufferedImage, FLIP_HORIZONTAL);
-            bufferedImageFlipV = flip(bufferedImage, FLIP_VERTICAL);
+            this.bufferedImage = ImageIO.read(new File(path));
+            this.bufferedImageFlipH = flip(bufferedImage, FLIP_HORIZONTAL);
+            this.bufferedImageFlipV = flip(bufferedImage, FLIP_VERTICAL);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public abstract void attack(AbstractPlayerObject enemy);
@@ -59,6 +65,7 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         final BufferedImage player = facing == Direction.RIGHT ? bufferedImage : bufferedImageFlipH;
         renderer.img(graphics, player, getPositionX(), getPositionY(), getWidth(), getHeight());
         renderer.drawCircle(graphics, getPositionX(), getEyePosY(), 5, 5, Color.RED);
+
     }
 
     public void controlPlayer() {
@@ -79,7 +86,7 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
                                 setPositionY(getPositionY() + getHeight() / 2 + getObjectStandingOn().getHeight());
                             }
                         }
-                        case KeyEvent.VK_X -> attack(null);
+                        case KeyEvent.VK_X -> attack(getRayTrace(10, Direction.RIGHT));
                         case KeyEvent.VK_A -> move(Direction.LEFT);
                         case KeyEvent.VK_D -> move(Direction.RIGHT);
                         case KeyEvent.VK_SPACE -> {
@@ -114,6 +121,20 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
                 }
             }
         }
+        if (healthPoints <= 0 && lives > 0) {
+            respawnPlayer();
+        }
+        if (lives <= 0) {
+            final GameFinishedEvent gameFinishedEvent = new GameFinishedEvent(lastDamageSource);
+            Game.instance.onEvent(gameFinishedEvent);
+        }
+    }
+
+    private void respawnPlayer() {
+        lives--;
+        healthPoints = spawnHealth;
+        setPositionX(spawnX);
+        setPositionY(spawnY);
     }
 
     public AbstractPlayerObject getRayTrace(int distance, Direction direction) {
@@ -202,16 +223,17 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         return onGround;
     }
 
-    public void addDamage(int damage) {
-        damageAmount = damageAmount + damage;
+    public void addDamage(int damage, AbstractPlayerObject damageSource) {
+        healthPoints = healthPoints - damage;
+        lastDamageSource = damageSource;
     }
 
-    public int getDamageAmount() {
-        return damageAmount;
+    public int getHealthPoints() {
+        return healthPoints;
     }
 
-    public void setDamageAmount(int damageAmount) {
-        this.damageAmount = damageAmount;
+    public void setHealthPoints(int damageAmount) {
+        this.healthPoints = damageAmount;
     }
 
     public Direction getFacing() {
@@ -228,6 +250,14 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
 
     public SoundHelper getSoundHelper() {
         return soundHelper;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public void setLives(int lives) {
+        this.lives = lives;
     }
 
     //https://www.ssbwiki.com/Knockback#Formula

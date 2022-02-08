@@ -1,14 +1,13 @@
 package de.itg.wahlkampf.object.players;
 
 import de.itg.wahlkampf.object.AbstractPlayerObject;
-import de.itg.wahlkampf.utilities.sound.Sound;
 
 import java.awt.event.KeyEvent;
 
-public class Player extends AbstractPlayerObject {
+public class TrumpPlayer extends AbstractPlayerObject {
 
-    public Player(int id) {
-        super("Player","resources\\Trump.png", id, 30, 120, 10, 21, 53);
+    public TrumpPlayer(int id) {
+        super("Trump", "resources\\Trump.png", id, 1000, 30, 120, 50, 21, 53);
     }
 
 
@@ -31,10 +30,8 @@ public class Player extends AbstractPlayerObject {
 
     @Override
     public void attack(AbstractPlayerObject enemy) {
-        Thread t = new Thread(() -> {
-            getSoundHelper().playMusic(Sound.HIT.getPath());
-        });
-        t.start();
+        if (enemy != null)
+            enemy.addDamage(5, this);
 
     }
 }

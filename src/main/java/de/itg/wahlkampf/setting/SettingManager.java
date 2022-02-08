@@ -17,9 +17,10 @@ public class SettingManager {
         settingList.add(new SettingCheckBox("Pause Game", false, false));
         settingList.add(new SettingCheckBox("Test 2", true));
         settingList.add(new SettingComboBox("Stage", Game.instance.getBackgroundMap().keySet().toArray(new String[0]), Game.instance.getBackgroundMap().keySet().toArray(new String[0])[0], true));
+        for (int i = 0; i < Game.instance.getPlayerAmount(); i++) {
+            settingList.add(new SettingComboBox("Player " + i, Game.instance.getPlayerNames().toArray(new String[0]), Game.instance.getPlayerNames().get(0), true));
+        }
         settingList.add(new SettingSlider("Test 2", 1, 10, 5, 0.5, true));
-
-
     }
 
     public Setting getSettingByName(String name) {
