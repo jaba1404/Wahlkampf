@@ -7,7 +7,7 @@ import java.awt.event.KeyEvent;
 public class TrumpPlayer extends AbstractPlayerObject {
 
     public TrumpPlayer(int id) {
-        super("Trump", "resources\\Trump.png", id, 1000, 30, 120, 50, 21, 53);
+        super("Trump", "resources\\Trump.png", id, 200, 30, 120, 50, 21, 53);
     }
 
 

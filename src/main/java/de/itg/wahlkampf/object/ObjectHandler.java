@@ -1,6 +1,7 @@
 package de.itg.wahlkampf.object;
 
 import de.itg.wahlkampf.Game;
+import de.itg.wahlkampf.event.impl.AddPlayerObjectsEvent;
 import de.itg.wahlkampf.object.objects.StageBlock;
 import de.itg.wahlkampf.object.players.MerkelPlayer;
 import de.itg.wahlkampf.object.players.TrumpPlayer;
@@ -12,12 +13,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class ObjectHandler {
 
     private final ArrayList<AbstractGameObject> gameObjects = new ArrayList<>();
     private final MathHelper mathHelper;
-    private int x = 0;
+    private int x = 200;
     private int y = 500;
     private BufferedImage[] dirtBlocks;
 
@@ -46,6 +48,8 @@ public class ObjectHandler {
                 case "Trump" -> addObject(new TrumpPlayer(i));
             }
         }
+        final AddPlayerObjectsEvent addPlayerObjectsEvent = new AddPlayerObjectsEvent(gameObjects.stream().filter(abstractGameObject -> abstractGameObject.getType() == Type.PLAYER).collect(Collectors.toList()));
+        Game.instance.onEvent(addPlayerObjectsEvent);
     }
 
     public ArrayList<AbstractGameObject> getGameObjects() {

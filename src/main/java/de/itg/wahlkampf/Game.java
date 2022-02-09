@@ -1,9 +1,11 @@
 package de.itg.wahlkampf;
 
 import de.itg.wahlkampf.event.Event;
+import de.itg.wahlkampf.event.impl.AddPlayerObjectsEvent;
 import de.itg.wahlkampf.event.impl.GameFinishedEvent;
 import de.itg.wahlkampf.event.impl.SettingChangeEvent;
 import de.itg.wahlkampf.menu.menus.FinishedMenu;
+import de.itg.wahlkampf.menu.menus.IngameMenu;
 import de.itg.wahlkampf.menu.menus.MainMenu;
 import de.itg.wahlkampf.object.AbstractGameObject;
 import de.itg.wahlkampf.object.AbstractPlayerObject;
@@ -45,9 +47,10 @@ public class Game extends Canvas implements Runnable {
     private final ParticleHandler particleHandler;
     private final SettingManager settingManager;
     private MainMenu menu;
+    private IngameMenu ingameMenu;
+    private final FinishedMenu finishedMenu;
     private int playerAmount = 2;
-
-    private FinishedMenu finishedMenu;
+    private List<AbstractPlayerObject> playerObjectList;
     private boolean running;
     private Thread thread;
     private final SettingCheckBox startGame;
@@ -75,13 +78,14 @@ public class Game extends Canvas implements Runnable {
         renderer = new Renderer();
         this.addKeyListener(new InputListener(this));
         window = new Window(GAME_TITLE, GAME_DIMENSION.width, GAME_DIMENSION.height, this);
+        objectHandler = new ObjectHandler();
         menu = new MainMenu();
         finishedMenu = new FinishedMenu();
         this.addMouseListener(menu);
         this.addMouseMotionListener(menu);
         addMouseListener(finishedMenu);
         addMouseMotionListener(finishedMenu);
-        objectHandler = new ObjectHandler();
+        playerObjectList = new ArrayList<>();
         particleHandler = new ParticleHandler();
     }
 
@@ -177,6 +181,9 @@ public class Game extends Canvas implements Runnable {
                 finishedMenu.setVisible(true);
             }
         }
+        if (event instanceof AddPlayerObjectsEvent) {
+            ingameMenu = new IngameMenu(((AddPlayerObjectsEvent) event).getAbstractGameObjects());
+        }
     }
 
     private void onRender() {
@@ -206,6 +213,7 @@ public class Game extends Canvas implements Runnable {
             for (AbstractGameObject gameObject : objectHandler.getGameObjects()) {
                 gameObject.onRender(graphics);
                 if (gameObject.getType() == Type.PLAYER) {
+                    ingameMenu.drawScreen(graphics);
                     renderer.textWithShadow(graphics, gameObject.getName() + " hp: " + ((AbstractPlayerObject) gameObject).getHealthPoints(), gameObject.getPositionX(), gameObject.getPositionY(), Color.WHITE, textFont);
                 }
             }

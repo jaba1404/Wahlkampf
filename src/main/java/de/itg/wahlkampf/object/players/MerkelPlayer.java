@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent;
 
 public class MerkelPlayer extends AbstractPlayerObject {
     public MerkelPlayer(int id) {
-        super("Merkel", "resources\\Merkel.png", id, 1000, 50, 180, 50, 21, 53);
+        super("Merkel", "resources\\Merkel.png", id, 200, 50, 180, 50, 21, 53);
     }
 //214 höhe 86 breite
 
