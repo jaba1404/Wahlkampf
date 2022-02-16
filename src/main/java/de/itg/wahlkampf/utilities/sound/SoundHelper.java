@@ -11,8 +11,8 @@ import static javax.sound.sampled.AudioSystem.getAudioInputStream;
 
 public class SoundHelper {
 
-    public void playMusic(String filePath) {
-        final File file = new File(filePath);
+    public void playMusic(File file) {
+        Thread t = new Thread(() -> {
 
         try (final AudioInputStream in = getAudioInputStream(file)) {
 
@@ -34,6 +34,8 @@ public class SoundHelper {
         } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
             throw new IllegalStateException(e);
         }
+        });
+        t.start();
     }
 
     private AudioFormat getOutFormat(AudioFormat inFormat) {
@@ -49,7 +51,6 @@ public class SoundHelper {
         for (int n = 0; n != -1; n = in.read(buffer, 0, buffer.length)) {
             line.write(buffer, 0, n);
         }
-
     }
 
 }

@@ -12,7 +12,7 @@ public class MerkelPlayer extends AbstractPlayerObject {
 
     @Override
     public void onTick() {
-        controlPlayer();
+        playerLogic();
     }
 
     @Override
@@ -27,6 +27,11 @@ public class MerkelPlayer extends AbstractPlayerObject {
 
     @Override
     public void attack(AbstractPlayerObject enemy) {
-
+        if (!enemy.isBlocking()) {
+            enemy.addDamage(5, this);
+            enemy.setVerticalMotion(enemy.getVerticalMotion() + 20);
+        } else {
+            enemy.setVerticalMotion(enemy.getVerticalMotion() + 10);
+        }
     }
 }

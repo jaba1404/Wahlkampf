@@ -9,14 +9,14 @@ import de.itg.wahlkampf.utilities.Renderer;
 import java.awt.*;
 import java.util.List;
 
-public class IngameMenu {
+public class InGameMenu {
     private final List<AbstractGameObject> gameObjects;
     private final Renderer renderer;
     private final Font playerName;
     private final Font playerHealth;
     private final Font playerLives;
 
-    public IngameMenu(List<AbstractGameObject> gameObjects) {
+    public InGameMenu(List<AbstractGameObject> gameObjects) {
         this.gameObjects = gameObjects;
         renderer = Game.instance.getRenderer();
         playerName = new Font("Roboto", Font.BOLD, 30);

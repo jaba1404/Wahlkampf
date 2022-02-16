@@ -7,7 +7,7 @@ public class SettingChangeEvent extends Event {
 
     private final AbstractSetting target;
     private boolean srcBoolean, dstBoolean;
-    private float srcFloat, dstFloat;
+    private double srcFloat, dstFloat;
     private String srcString, dstString;
 
     public SettingChangeEvent(AbstractSetting target) {
@@ -20,7 +20,7 @@ public class SettingChangeEvent extends Event {
         this.dstBoolean = dstBoolean;
     }
 
-    public SettingChangeEvent(AbstractSetting target, float srcFloat, float dstFloat) {
+    public SettingChangeEvent(AbstractSetting target, double srcFloat, double dstFloat) {
         this.target = target;
         this.srcFloat = srcFloat;
         this.dstFloat = dstFloat;
@@ -44,11 +44,11 @@ public class SettingChangeEvent extends Event {
         return dstBoolean;
     }
 
-    public float getSrcFloat() {
+    public double getSrcFloat() {
         return srcFloat;
     }
 
-    public float getDstFloat() {
+    public double getDstFloat() {
         return dstFloat;
     }
 

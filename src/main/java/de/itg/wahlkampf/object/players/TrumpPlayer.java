@@ -13,11 +13,7 @@ public class TrumpPlayer extends AbstractPlayerObject {
 
     @Override
     public void onTick() {
-        controlPlayer();
-        AbstractPlayerObject enemy = getRayTrace(100, getFacing());
-        if (enemy != null) {
-
-        }
+        playerLogic();
     }
 
     @Override
@@ -30,11 +26,11 @@ public class TrumpPlayer extends AbstractPlayerObject {
 
     @Override
     public void attack(AbstractPlayerObject enemy) {
-        if (enemy != null) {
+        if (!enemy.isBlocking() || !enemy.canBlock()) {
             enemy.addDamage(5, this);
-
-            enemy.setVerticalMotion(enemy.getVerticalMotion() + 30);
+            enemy.setVerticalMotion(enemy.getVerticalMotion() + 20);
+        } else {
+            enemy.setVerticalMotion(enemy.getVerticalMotion() + 10);
         }
-
     }
 }

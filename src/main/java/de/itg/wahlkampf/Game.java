@@ -1,11 +1,9 @@
 package de.itg.wahlkampf;
 
 import de.itg.wahlkampf.event.Event;
-import de.itg.wahlkampf.event.impl.AddPlayerObjectsEvent;
-import de.itg.wahlkampf.event.impl.GameFinishedEvent;
-import de.itg.wahlkampf.event.impl.SettingChangeEvent;
+import de.itg.wahlkampf.event.impl.*;
 import de.itg.wahlkampf.menu.menus.FinishedMenu;
-import de.itg.wahlkampf.menu.menus.IngameMenu;
+import de.itg.wahlkampf.menu.menus.InGameMenu;
 import de.itg.wahlkampf.menu.menus.MainMenu;
 import de.itg.wahlkampf.object.AbstractGameObject;
 import de.itg.wahlkampf.object.AbstractPlayerObject;
@@ -20,6 +18,8 @@ import de.itg.wahlkampf.utilities.InputListener;
 import de.itg.wahlkampf.utilities.Renderer;
 import de.itg.wahlkampf.utilities.particlesystem.AbstractParticle;
 import de.itg.wahlkampf.utilities.particlesystem.ParticleHandler;
+import de.itg.wahlkampf.utilities.sound.Sound;
+import de.itg.wahlkampf.utilities.sound.SoundHelper;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -46,8 +46,9 @@ public class Game extends Canvas implements Runnable {
     private final Renderer renderer;
     private final ParticleHandler particleHandler;
     private final SettingManager settingManager;
+    private final SoundHelper soundHelper;
     private MainMenu menu;
-    private IngameMenu ingameMenu;
+    private InGameMenu ingameMenu;
     private final FinishedMenu finishedMenu;
     private int playerAmount = 2;
     private List<AbstractPlayerObject> playerObjectList;
@@ -64,6 +65,7 @@ public class Game extends Canvas implements Runnable {
     public Game() {
         instance = this;
         ImageHelper imageHelper = new ImageHelper();
+        soundHelper = new SoundHelper();
         backgroundMap = Stream.of(new Object[][]{
                 {"White House", new File("resources\\hintergrund 1.gif")},
                 {"Red Arena", new File("resources\\9BC613A2-35B0-488D-B6AC-E217003CA6C8.gif")},
@@ -174,15 +176,26 @@ public class Game extends Canvas implements Runnable {
             if (((SettingChangeEvent) event).getTarget() == stageSetting) {
                 backgroundFile = backgroundMap.get(((SettingChangeEvent) event).getDstString());
             }
+            soundHelper.playMusic(Sound.SETTINGS_CHANGE.getFile());
         }
         if (event instanceof GameFinishedEvent) {
             if (finishedMenu.getAbstractPlayerObject() == null) {
                 finishedMenu.setAbstractPlayerObject((AbstractPlayerObject) ((GameFinishedEvent) event).getWinner());
+                soundHelper.playMusic(Sound.FINISHED.getFile());
                 finishedMenu.setVisible(true);
             }
         }
         if (event instanceof AddPlayerObjectsEvent) {
-            ingameMenu = new IngameMenu(((AddPlayerObjectsEvent) event).getAbstractGameObjects());
+            ingameMenu = new InGameMenu(((AddPlayerObjectsEvent) event).getAbstractGameObjects());
+        }
+        if(event instanceof PlayerAttackEvent) {
+            soundHelper.playMusic(Sound.HIT.getFile());
+        }
+        if (event instanceof PlayerJumpEvent) {
+            soundHelper.playMusic(Sound.JUMP.getFile());
+        }
+        if(event instanceof PlayerBlockEvent) {
+            soundHelper.playMusic(Sound.BLOCK.getFile());
         }
     }
 

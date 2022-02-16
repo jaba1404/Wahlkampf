@@ -1,6 +1,7 @@
 package de.itg.wahlkampf.setting.settings;
 
 import de.itg.wahlkampf.Game;
+import de.itg.wahlkampf.event.impl.SettingChangeEvent;
 import de.itg.wahlkampf.setting.AbstractSetting;
 
 public class SettingSlider extends AbstractSetting {
@@ -65,6 +66,10 @@ public class SettingSlider extends AbstractSetting {
     }
 
     public void setCurrentValue(double currentValue) {
+        if(this.currentValue != currentValue) {
+            final SettingChangeEvent event = new SettingChangeEvent(this, this.currentValue, currentValue);
+            Game.instance.onEvent(event);
+        }
         this.currentValue = currentValue;
     }
 }

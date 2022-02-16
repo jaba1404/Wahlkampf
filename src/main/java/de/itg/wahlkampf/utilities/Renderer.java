@@ -11,7 +11,10 @@ public class Renderer {
         graphics.setColor(color);
         graphics.drawOval(x, y, width, height);
     }
-
+    public void drawFillCircle(Graphics graphics,int x, int y, int width, int height, Color color) {
+        graphics.setColor(color);
+        graphics.fillOval(x, y, width, height);
+    }
     public void text(Graphics graphics,String string, int x, int y, Color color, Font font) {
         graphics.setFont(font);
         graphics.setColor(color);
