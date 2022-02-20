@@ -9,9 +9,7 @@ import de.itg.wahlkampf.utilities.MathHelper;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -20,23 +18,28 @@ public class ObjectHandler {
 
     private final ArrayList<AbstractGameObject> gameObjects = new ArrayList<>();
     private final MathHelper mathHelper;
-    private int x = 200;
+    private int x = 200, x2 = x;
     private int y = 500;
     private BufferedImage[] dirtBlocks;
 
     public ObjectHandler() {
         try {
-            dirtBlocks = new BufferedImage[]{ImageIO.read(new File("resources\\grass_block_left.png")), ImageIO.read(new File("resources\\grass_block.png")), ImageIO.read(new File("resources\\grass_block_right.png"))};
+            dirtBlocks = new BufferedImage[]{
+                    ImageIO.read(Game.class.getResource("/de/itg/wahlkampf/assets/grass_block_left.png")),
+                    ImageIO.read(Game.class.getResource("/de/itg/wahlkampf/assets/grass_block.png")),
+                    ImageIO.read(Game.class.getResource("/de/itg/wahlkampf/assets/grass_block_right.png"))
+            };
         } catch (IOException e) {
             e.printStackTrace();
         }
         mathHelper = new MathHelper();
         for (int i = 0; i < 2; i++) {
-            int width = mathHelper.getRandomInt(100, 600);
-            int width2 = mathHelper.getRandomInt(100, 600);
+            int width = Math.round(mathHelper.getRandomInt(100, 600) / 30f) * 30;
+            int width2 = Math.round(mathHelper.getRandomInt(100, 600) / 30f) * 30;
             addObject(new StageBlock(x, y, width, 30, dirtBlocks, true));
-            addObject(new StageBlock(x, y - 150, width2, 30, dirtBlocks, true));
-            x += mathHelper.getRandomInt(width, width + 200);
+            addObject(new StageBlock(x2, y - 150, width2, 30, dirtBlocks, true));
+            x += mathHelper.getRandomInt(width + 100, width + 200);
+            x2 += mathHelper.getRandomInt(width2 + 100, width2 + 200);
         }
         addObject(new StageBlock(0, 660, Game.instance.getWidth(), 30, new Color(0, 0, 0, 0), false));
     }

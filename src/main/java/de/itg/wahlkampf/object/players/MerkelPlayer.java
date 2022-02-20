@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent;
 
 public class MerkelPlayer extends AbstractPlayerObject {
     public MerkelPlayer(int id) {
-        super("Merkel", "resources\\Merkel.png", id, 200, 50, 180, 50, 21, 53);
+        super("Merkel", "Merkel.png", id, 200, 50, 180, 50, 21, 53);
     }
 //214 höhe 86 breite
 
@@ -31,7 +31,7 @@ public class MerkelPlayer extends AbstractPlayerObject {
             enemy.addDamage(5, this);
             enemy.setVerticalMotion(enemy.getVerticalMotion() + 20);
         } else {
-            enemy.setVerticalMotion(enemy.getVerticalMotion() + 10);
+            enemy.setVerticalMotion(enemy.getVerticalMotion() + 5);
         }
     }
 }

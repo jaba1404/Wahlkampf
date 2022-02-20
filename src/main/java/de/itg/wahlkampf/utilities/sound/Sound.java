@@ -1,21 +1,24 @@
 package de.itg.wahlkampf.utilities.sound;
 
-import java.io.File;
+import de.itg.wahlkampf.Game;
+
+import java.net.URL;
 
 public enum Sound {
-    HIT(new File("resources/Hit_Hurt7.wav")),
-    FINISHED(new File("resources/Powerup11.wav")),
-    JUMP(new File("resources/Jump9.wav")),
-    BLOCK(new File("resources/Block.wav")),
-    SETTINGS_CHANGE(new File("resources/SettingsChange.wav"));
 
-    private File file;
+    HIT(Game.class.getResource("assets/Hit_Hurt7.wav")),
+    FINISHED(Game.class.getResource("assets/Powerup11.wav")),
+    JUMP(Game.class.getResource("assets/Jump9.wav")),
+    BLOCK(Game.class.getResource("assets/Block.wav")),
+    SETTINGS_CHANGE(Game.class.getResource("assets/SettingsChange.wav"));
 
-    Sound(File file) {
-        this.file = file;
+    private final URL location;
+
+    Sound(URL location) {
+        this.location = location;
     }
 
-    public File getFile() {
-        return file;
+    public URL getLocation() {
+        return location;
     }
 }

@@ -4,38 +4,37 @@ import javax.sound.sampled.*;
 import javax.sound.sampled.DataLine.Info;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import static javax.sound.sampled.AudioFormat.Encoding.PCM_SIGNED;
 import static javax.sound.sampled.AudioSystem.getAudioInputStream;
 
-
 public class SoundHelper {
 
-    public void playMusic(File file) {
-        Thread t = new Thread(() -> {
+    public void playMusic(URL location) {
+        final Thread thread = new Thread(() -> {
+            try (final AudioInputStream in = getAudioInputStream(location)) {
 
-        try (final AudioInputStream in = getAudioInputStream(file)) {
+                final AudioFormat outFormat = getOutFormat(in.getFormat());
+                final Info info = new Info(SourceDataLine.class, outFormat);
 
-            final AudioFormat outFormat = getOutFormat(in.getFormat());
-            final Info info = new Info(SourceDataLine.class, outFormat);
+                try (final SourceDataLine line =
+                             (SourceDataLine) AudioSystem.getLine(info)) {
 
-            try (final SourceDataLine line =
-                         (SourceDataLine) AudioSystem.getLine(info)) {
-
-                if (line != null) {
-                    line.open(outFormat);
-                    line.start();
-                    stream(getAudioInputStream(outFormat, in), line);
-                    line.drain();
-                    line.stop();
+                    if (line != null) {
+                        line.open(outFormat);
+                        line.start();
+                        stream(getAudioInputStream(outFormat, in), line);
+                        line.drain();
+                        line.stop();
+                    }
                 }
-            }
 
-        } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
-            throw new IllegalStateException(e);
-        }
+            } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
+                throw new IllegalStateException(e);
+            }
         });
-        t.start();
+        thread.start();
     }
 
     private AudioFormat getOutFormat(AudioFormat inFormat) {

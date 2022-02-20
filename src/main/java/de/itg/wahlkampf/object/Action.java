@@ -1,5 +1,5 @@
 package de.itg.wahlkampf.object;
 
 public enum Action {
-    ATTACK, BLOCK, UP, FORWARDS, BACKWARDS, DOWN;
+    ATTACK, BLOCK, JUMP, FORWARDS, BACKWARDS, CLIP, UP, DOWN;
 }

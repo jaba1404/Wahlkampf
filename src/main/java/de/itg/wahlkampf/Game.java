@@ -13,7 +13,6 @@ import de.itg.wahlkampf.setting.SettingManager;
 import de.itg.wahlkampf.setting.settings.SettingCheckBox;
 import de.itg.wahlkampf.setting.settings.SettingComboBox;
 import de.itg.wahlkampf.utilities.Font;
-import de.itg.wahlkampf.utilities.ImageHelper;
 import de.itg.wahlkampf.utilities.InputListener;
 import de.itg.wahlkampf.utilities.Renderer;
 import de.itg.wahlkampf.utilities.particlesystem.AbstractParticle;
@@ -21,11 +20,10 @@ import de.itg.wahlkampf.utilities.particlesystem.ParticleHandler;
 import de.itg.wahlkampf.utilities.sound.Sound;
 import de.itg.wahlkampf.utilities.sound.SoundHelper;
 
-import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
-import java.io.File;
-import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,20 +54,19 @@ public class Game extends Canvas implements Runnable {
     private Thread thread;
     private final SettingCheckBox startGame;
     private final SettingComboBox stageSetting;
-    private final Map<String, File> backgroundMap;
-    private File backgroundFile;
+    private final Map<String, URL> backgroundMap;
+    private URL backgroundFile;
 
     private float framesPerSecond = 60;
     private final Font textFont = new Font("Roboto", Font.PLAIN, 12);
 
     public Game() {
         instance = this;
-        ImageHelper imageHelper = new ImageHelper();
         soundHelper = new SoundHelper();
         backgroundMap = Stream.of(new Object[][]{
-                {"White House", new File("resources\\hintergrund 1.gif")},
-                {"Red Arena", new File("resources\\9BC613A2-35B0-488D-B6AC-E217003CA6C8.gif")},
-        }).collect(Collectors.toMap(data -> (String) data[0], data -> (File) data[1]));
+                {"White House", getClass().getResource("assets/hintergrund 1.gif")},
+                {"Red Arena", getClass().getResource("assets/9BC613A2-35B0-488D-B6AC-E217003CA6C8.gif")},
+        }).collect(Collectors.toMap(data -> (String) data[0], data -> (URL) data[1]));
         playerNames.addAll(Arrays.asList("Trump", "Merkel"));
         playerNames.add("None");
         settingManager = new SettingManager();
@@ -176,12 +173,12 @@ public class Game extends Canvas implements Runnable {
             if (((SettingChangeEvent) event).getTarget() == stageSetting) {
                 backgroundFile = backgroundMap.get(((SettingChangeEvent) event).getDstString());
             }
-            soundHelper.playMusic(Sound.SETTINGS_CHANGE.getFile());
+            soundHelper.playMusic(Sound.SETTINGS_CHANGE.getLocation());
         }
         if (event instanceof GameFinishedEvent) {
             if (finishedMenu.getAbstractPlayerObject() == null) {
                 finishedMenu.setAbstractPlayerObject((AbstractPlayerObject) ((GameFinishedEvent) event).getWinner());
-                soundHelper.playMusic(Sound.FINISHED.getFile());
+                soundHelper.playMusic(Sound.FINISHED.getLocation());
                 finishedMenu.setVisible(true);
             }
         }
@@ -189,13 +186,13 @@ public class Game extends Canvas implements Runnable {
             ingameMenu = new InGameMenu(((AddPlayerObjectsEvent) event).getAbstractGameObjects());
         }
         if(event instanceof PlayerAttackEvent) {
-            soundHelper.playMusic(Sound.HIT.getFile());
+            soundHelper.playMusic(Sound.HIT.getLocation());
         }
         if (event instanceof PlayerJumpEvent) {
-            soundHelper.playMusic(Sound.JUMP.getFile());
+            soundHelper.playMusic(Sound.JUMP.getLocation());
         }
         if(event instanceof PlayerBlockEvent) {
-            soundHelper.playMusic(Sound.BLOCK.getFile());
+            soundHelper.playMusic(Sound.BLOCK.getLocation());
         }
     }
 
@@ -206,12 +203,9 @@ public class Game extends Canvas implements Runnable {
             return;
         }
 
-        Graphics graphics = bufferStrategy.getDrawGraphics();
-        try {
-            renderer.img(graphics, ImageIO.read(backgroundFile), 0, 0, GAME_DIMENSION.width, GAME_DIMENSION.height);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        final Graphics graphics = bufferStrategy.getDrawGraphics();
+        final Image image = new ImageIcon(backgroundFile).getImage();
+        renderer.img(graphics, image, 0, 0, GAME_DIMENSION.width, GAME_DIMENSION.height);
 
         renderer.textWithShadow(graphics, GAME_TITLE, 1, 10, Color.white, textFont);
         renderer.textWithShadow(graphics, "FPS: " + framesPerSecond, 1, 25, Color.white, textFont);
@@ -232,9 +226,13 @@ public class Game extends Canvas implements Runnable {
             }
             menu = null;
         }
-        for (AbstractParticle particle : particleHandler.getParticleList()) {
-            particle.drawParticle(graphics);
+
+        if (particleHandler != null) {
+            for (AbstractParticle particle : particleHandler.getParticleList()) {
+                particle.drawParticle(graphics);
+            }
         }
+
         if (finishedMenu.isVisible()) {
             finishedMenu.drawScreen(graphics);
         }
@@ -267,7 +265,7 @@ public class Game extends Canvas implements Runnable {
         return playerAmount;
     }
 
-    public Map<String, File> getBackgroundMap() {
+    public Map<String, URL> getBackgroundMap() {
         return backgroundMap;
     }
 }

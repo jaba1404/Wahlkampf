@@ -42,7 +42,7 @@ public class Renderer {
         graphics.drawImage(image, x, y, Game.WIDTH, Game.HEIGHT, null);
     }
 
-    public void img(Graphics graphics,BufferedImage image, int x, int y, int width, int height) {
+    public void img(Graphics graphics,Image image, int x, int y, int width, int height) {
         //g.drawImage(img, x, y, null);
         graphics.drawImage(image, x, y, width, height, null);
     }

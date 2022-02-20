@@ -33,13 +33,13 @@ public class StageBlock extends AbstractGameObject {
         if (bufferedImage == null) {
             renderer.drawFillRectangle(graphics,getPositionX(), getPositionY(), getWidth(), getHeight(), color);
         } else {
-            int amount = getWidth() / 30;
+            final int amount = getWidth() / 30;
             int positionX = getPositionX();
-            for (int i = 0; i <= amount; i++) {
+            for (int i = 0; i < amount; i++) {
                 if (i == 0) {
                     renderer.img(graphics,bufferedImage[0], positionX, getPositionY(), 30, getHeight());
-                } else if (i == amount) {
-                    renderer.img(graphics,bufferedImage[2], positionX, getPositionY(), amount, getHeight());
+                } else if (i == amount - 1) {
+                    renderer.img(graphics,bufferedImage[2], positionX, getPositionY(), 30, getHeight());
                 } else {
                     renderer.img(graphics,bufferedImage[1], positionX, getPositionY(), 30, getHeight());
                 }

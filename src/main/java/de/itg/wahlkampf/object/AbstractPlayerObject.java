@@ -47,6 +47,7 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     private final SoundHelper soundHelper;
     private final int id;
     private Direction facing = Direction.RIGHT;
+    private Direction attackFacing = Direction.RIGHT;
     private BufferedImage bufferedImage;
     private BufferedImage bufferedImageFlipH;
     private BufferedImage bufferedImageFlipV;
@@ -74,11 +75,11 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         this.spawnY = positionY;
         this.spawnHealth = healthPoints;
         try {
-            this.bufferedImage = ImageIO.read(new File(path));
+            this.bufferedImage = ImageIO.read(Game.class.getResource("assets/" + path));
             this.bufferedImageFlipH = flip(bufferedImage, FLIP_HORIZONTAL);
             this.bufferedImageFlipV = flip(bufferedImage, FLIP_VERTICAL);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
         }
         playerAttackEvent = new PlayerAttackEvent(this);
         playerJumpEvent = new PlayerJumpEvent(this);
@@ -94,6 +95,11 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         renderer.drawCircle(graphics, getPositionX(), getEyePosY(), 5, 5, Color.RED);
         if (isBlocking() && canBlock()) {
             renderer.drawFillCircle(graphics, getPositionX() - 5, getPositionY() - 5, getWidth() + 10, getHeight() + 10, new Color(118, 231, 118, 150));
+        }
+        if(facing.getHorizontalFactor() != 0) {
+            final AbstractGameObject below = getObjectStandingOn();
+            if(below != null) {
+            }
         }
     }
 
@@ -130,16 +136,18 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
             attack = true;
         }
 
-        if (!InputListener.KEY_LIST.contains(keyBindMap.get(Action.DOWN))) {
+        if (!InputListener.KEY_LIST.contains(keyBindMap.get(Action.CLIP))) {
             clip = true;
         }
 
-        if (!InputListener.KEY_LIST.contains(keyBindMap.get(Action.UP))) {
+        if (!InputListener.KEY_LIST.contains(keyBindMap.get(Action.JUMP))) {
             jump = true;
         }
         setBlocking(false);
-        for (Integer integer : InputListener.KEY_LIST) {
-            if (Objects.equals(integer, keyBindMap.get(Action.DOWN))) {
+
+        final List<Integer> keyList = new ArrayList<>(InputListener.KEY_LIST);
+        for (Integer integer : keyList) {
+            if (Objects.equals(integer, keyBindMap.get(Action.CLIP))) {
                 if (clip) {
                     final AbstractGameObject gameObject = getObjectStandingOn();
                     if (gameObject != null && gameObject.isPassThrough()) {
@@ -149,7 +157,7 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
                 }
             } else if (Objects.equals(integer, keyBindMap.get(Action.ATTACK))) {
                 if (attack) {
-                    final AbstractPlayerObject rayTraced = getRayTrace(100, Direction.RIGHT);
+                    final AbstractPlayerObject rayTraced = getRayTrace(attackFacing == Direction.DOWN || attackFacing == Direction.UP ? 60 : 40, attackFacing);
                     if (rayTraced != null) {
                         attack(rayTraced);
                         if (rayTraced.isBlocking() && rayTraced.canBlock()) {
@@ -164,11 +172,18 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
                 }
             } else if (Objects.equals(integer, keyBindMap.get(Action.BLOCK))) {
                 setBlocking(true);
+                setHorizontalMotion(getHorizontalMotion() / 2);
             } else if (Objects.equals(integer, keyBindMap.get(Action.FORWARDS))) {
+                setAttackFacing(Direction.RIGHT);
                 move(Direction.RIGHT);
             } else if (Objects.equals(integer, keyBindMap.get(Action.BACKWARDS))) {
+                setAttackFacing(Direction.LEFT);
                 move(Direction.LEFT);
             } else if (Objects.equals(integer, keyBindMap.get(Action.UP))) {
+                setAttackFacing(Direction.UP);
+            } else if (Objects.equals(integer, keyBindMap.get(Action.DOWN))) {
+                setAttackFacing(Direction.DOWN);
+            } else if (Objects.equals(integer, keyBindMap.get(Action.JUMP))) {
                 if (jump && ++jumpCounter <= MAX_AIR_JUMPS) {
                     verticalMotion = 30;
                     jump = false;
@@ -206,10 +221,42 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         onGround = false;
         for (AbstractGameObject gameObject : Game.instance.getObjectHandler().getGameObjects()) {
             if (gameObject instanceof AbstractPlayerObject && gameObject != this) {
+                System.out.println(mathHelper.getDistanceTo(this, gameObject));
                 final AxisAligned objectsAxisAligned = new AxisAligned(gameObject.getPositionX(), gameObject.getPositionX() + gameObject.getWidth(), gameObject.getPositionY(), gameObject.getPositionY() + gameObject.getHeight());
-                if (getEyePosY() >= objectsAxisAligned.getMinY() && getEyePosY() <= objectsAxisAligned.getMaxY()) {
-                    if (mathHelper.getDistanceTo(this, gameObject) <= distance) {
-                        return (AbstractPlayerObject) gameObject;
+                System.out.println(direction);
+                switch (direction) {
+                    case DOWN, UP -> {
+                        if (playerAxisAligned.getMaxX() >= objectsAxisAligned.getMinX() && playerAxisAligned.getMinX() <= objectsAxisAligned.getMaxX()) {
+                            System.out.println("wdfadaw");
+                            if (mathHelper.getDistanceTo(this, gameObject) <= distance) {
+                                return (AbstractPlayerObject) gameObject;
+                            }
+                        }
+                    }
+                    case RIGHT -> {
+                        if (getEyePosY() >= objectsAxisAligned.getMinY() && getEyePosY() <= objectsAxisAligned.getMaxY()) {
+                            if (playerAxisAligned.getMaxX() >= objectsAxisAligned.getMinX() && playerAxisAligned.getMinX() + getWidth() / 2 <= objectsAxisAligned.getMaxX()) {
+                                System.out.println("dfawfawafafaw");
+                                return (AbstractPlayerObject) gameObject;
+                            } else if (playerAxisAligned.getMaxX() <= objectsAxisAligned.getMinX()) {
+                                if (mathHelper.getDistanceTo(this, gameObject) <= distance) {
+                                    return (AbstractPlayerObject) gameObject;
+                                }
+                            }
+                        }
+                    }
+                    case LEFT -> {
+                        if (getEyePosY() >= objectsAxisAligned.getMinY() && getEyePosY() <= objectsAxisAligned.getMaxY()) {
+                            if (playerAxisAligned.getMinX() <= objectsAxisAligned.getMaxX() && playerAxisAligned.getMaxX() - getWidth() / 2 >= objectsAxisAligned.getMinX()) {
+                                System.out.println("dfawfawafafaw");
+
+                                return (AbstractPlayerObject) gameObject;
+                            } else if (playerAxisAligned.getMinX() >= objectsAxisAligned.getMaxX()) {
+                                if (mathHelper.getDistanceTo(this, gameObject) <= distance) {
+                                    return (AbstractPlayerObject) gameObject;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -285,18 +332,22 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
             case 0 -> {
                 keyBindMap.put(Action.FORWARDS, KeyEvent.VK_D);
                 keyBindMap.put(Action.BACKWARDS, KeyEvent.VK_A);
-                keyBindMap.put(Action.UP, KeyEvent.VK_SPACE);
-                keyBindMap.put(Action.DOWN, KeyEvent.VK_S);
+                keyBindMap.put(Action.JUMP, KeyEvent.VK_SPACE);
+                keyBindMap.put(Action.CLIP, KeyEvent.VK_Y);
                 keyBindMap.put(Action.ATTACK, KeyEvent.VK_X);
                 keyBindMap.put(Action.BLOCK, KeyEvent.VK_C);
+                keyBindMap.put(Action.DOWN, KeyEvent.VK_S);
+                keyBindMap.put(Action.UP, KeyEvent.VK_W);
             }
             case 1 -> {
                 keyBindMap.put(Action.FORWARDS, KeyEvent.VK_RIGHT);
                 keyBindMap.put(Action.BACKWARDS, KeyEvent.VK_LEFT);
-                keyBindMap.put(Action.UP, KeyEvent.VK_SHIFT);
-                keyBindMap.put(Action.DOWN, KeyEvent.VK_DOWN);
+                keyBindMap.put(Action.JUMP, KeyEvent.VK_SHIFT);
+                keyBindMap.put(Action.CLIP, KeyEvent.VK_DOWN);
                 keyBindMap.put(Action.ATTACK, KeyEvent.VK_CONTROL);
                 keyBindMap.put(Action.BLOCK, KeyEvent.VK_NUMPAD0);
+                keyBindMap.put(Action.DOWN, KeyEvent.VK_DOWN);
+                keyBindMap.put(Action.UP, KeyEvent.VK_UP);
             }
         }
     }
@@ -324,6 +375,18 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
 
     public Direction getFacing() {
         return this.facing;
+    }
+
+    public void setFacing(Direction facing) {
+        this.facing = facing;
+    }
+
+    public Direction getAttackFacing() {
+        return attackFacing;
+    }
+
+    public void setAttackFacing(Direction attackFacing) {
+        this.attackFacing = attackFacing;
     }
 
     public String getPath() {

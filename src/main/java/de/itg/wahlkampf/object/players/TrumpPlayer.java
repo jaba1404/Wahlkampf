@@ -7,7 +7,7 @@ import java.awt.event.KeyEvent;
 public class TrumpPlayer extends AbstractPlayerObject {
 
     public TrumpPlayer(int id) {
-        super("Trump", "resources\\Trump.png", id, 200, 30, 120, 50, 21, 53);
+        super("Trump", "Trump.png", id, 200, 30, 120, 50, 21, 53);
     }
 
 
@@ -30,7 +30,7 @@ public class TrumpPlayer extends AbstractPlayerObject {
             enemy.addDamage(5, this);
             enemy.setVerticalMotion(enemy.getVerticalMotion() + 20);
         } else {
-            enemy.setVerticalMotion(enemy.getVerticalMotion() + 10);
+            enemy.setVerticalMotion(enemy.getVerticalMotion() + 5);
         }
     }
 }
