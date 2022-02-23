@@ -1,6 +1,6 @@
-package de.itg.wahlkampf.menu.element.elements;
+package de.itg.wahlkampf.menu.optionui.elements;
 
-import de.itg.wahlkampf.menu.Panel;
+import de.itg.wahlkampf.menu.optionui.Panel;
 import de.itg.wahlkampf.menu.element.AbstractElement;
 import de.itg.wahlkampf.setting.AbstractSetting;
 import de.itg.wahlkampf.setting.settings.SettingComboBox;

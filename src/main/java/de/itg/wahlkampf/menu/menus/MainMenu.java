@@ -1,8 +1,8 @@
 package de.itg.wahlkampf.menu.menus;
 
 import de.itg.wahlkampf.Game;
-import de.itg.wahlkampf.menu.Button;
-import de.itg.wahlkampf.menu.Panel;
+import de.itg.wahlkampf.menu.optionui.Button;
+import de.itg.wahlkampf.menu.optionui.Panel;
 import de.itg.wahlkampf.setting.settings.SettingCheckBox;
 import de.itg.wahlkampf.setting.settings.SettingComboBox;
 import de.itg.wahlkampf.utilities.Font;
@@ -13,7 +13,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-public class MainMenu extends MouseAdapter {
+public class MainMenu extends MouseAdapter implements IMenu {
     private final Button startButton;
     private final Button optionButton;
     private final Button quitButton;
@@ -40,6 +40,7 @@ public class MainMenu extends MouseAdapter {
         renderer = Game.instance.getRenderer();
     }
 
+    @Override
     public void drawScreen(Graphics graphics) {
         if (startGame.isActive())
             return;

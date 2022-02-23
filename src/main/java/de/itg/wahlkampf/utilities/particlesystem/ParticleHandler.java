@@ -24,7 +24,7 @@ public class ParticleHandler {
         }
         if (!particleList.isEmpty()) {
             for (int i = 0; i < particleList.size(); i++) {
-                AbstractParticle particle = particleList.get(i);
+               final AbstractParticle particle = particleList.get(i);
                 if (particle.getTimeHelper().hasPassed(time)) {
                     particleList.remove(particle);
                 }

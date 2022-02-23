@@ -1,10 +1,10 @@
-package de.itg.wahlkampf.menu;
+package de.itg.wahlkampf.menu.optionui;
 
 import de.itg.wahlkampf.Game;
 import de.itg.wahlkampf.menu.element.AbstractElement;
-import de.itg.wahlkampf.menu.element.elements.ElementCheckBox;
-import de.itg.wahlkampf.menu.element.elements.ElementComboBox;
-import de.itg.wahlkampf.menu.element.elements.ElementSlider;
+import de.itg.wahlkampf.menu.optionui.elements.ElementCheckBox;
+import de.itg.wahlkampf.menu.optionui.elements.ElementComboBox;
+import de.itg.wahlkampf.menu.optionui.elements.ElementSlider;
 import de.itg.wahlkampf.setting.settings.SettingCheckBox;
 import de.itg.wahlkampf.setting.settings.SettingComboBox;
 import de.itg.wahlkampf.setting.settings.SettingSlider;
@@ -15,7 +15,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Panel {
+public class Panel implements IComponent {
     private String title;
     private int x, y, clickX, clickY;
     private boolean dragging, extended;
@@ -34,8 +34,9 @@ public class Panel {
         loadElements();
     }
 
+    @Override
     public void drawScreen(Graphics graphics, int mouseX, int mouseY) {
-        if(!isVisible)
+        if (!isVisible)
             return;
         if (dragging) {
             x = clickX + mouseX;
@@ -53,8 +54,9 @@ public class Panel {
         }
     }
 
+    @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if(!isVisible)
+        if (!isVisible)
             return;
         if (mouseX >= x && mouseX < x + getWidth() && mouseY >= y && mouseY < y + getHeight()) {
             if (mouseButton == 3) {
@@ -68,11 +70,13 @@ public class Panel {
         }
     }
 
+    @Override
     public void mouseDragged(int mouseX, int mouseY, int mouseButton) {
-        if(!isVisible)
+        if (!isVisible)
             return;
     }
 
+    @Override
     public void mousePressed(int mouseX, int mouseY, int mouseButton) {
         if (!isVisible)
             return;
@@ -91,8 +95,9 @@ public class Panel {
         }
     }
 
+    @Override
     public void mouseReleased(int mouseX, int mouseY) {
-        if(!isVisible)
+        if (!isVisible)
             return;
         dragging = false;
         if (extended) {

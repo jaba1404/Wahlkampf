@@ -1,9 +1,9 @@
 package de.itg.wahlkampf.event.impl;
 
-import de.itg.wahlkampf.event.Event;
+import de.itg.wahlkampf.event.AbstractEvent;
 import de.itg.wahlkampf.setting.AbstractSetting;
 
-public class SettingChangeEvent extends Event {
+public class SettingChangeEvent extends AbstractEvent {
 
     private final AbstractSetting target;
     private boolean srcBoolean, dstBoolean;

@@ -13,7 +13,7 @@ public class RoundParticle extends AbstractParticle {
     @Override
     public void drawParticle(Graphics graphics) {
         graphics.setColor(getColor());
-        graphics.drawOval(getX(), getY(), getSize(), getSize());
+        graphics.fillOval(getX(), getY(), getSize(), getSize());
     }
 
     @Override

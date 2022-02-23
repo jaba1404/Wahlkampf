@@ -1,6 +1,6 @@
-package de.itg.wahlkampf.menu.element.elements;
+package de.itg.wahlkampf.menu.optionui.elements;
 
-import de.itg.wahlkampf.menu.Panel;
+import de.itg.wahlkampf.menu.optionui.Panel;
 import de.itg.wahlkampf.menu.element.AbstractElement;
 import de.itg.wahlkampf.setting.settings.SettingCheckBox;
 import de.itg.wahlkampf.utilities.Font;
@@ -29,7 +29,7 @@ public class ElementCheckBox extends AbstractElement {
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (getSetting().canRender() && getSetting().isShowInOptions()) {
-            if (mouseX <= getX() + width && mouseX >= getX() && mouseY <= getY() + getHeight() && mouseY >= getY()) {
+            if (mouseX <= getX() + width && mouseX > getX() && mouseY <= getY() + getHeight() && mouseY > getY()) {
                 setting.setActive(!setting.isActive());
             }
         }

@@ -1,6 +1,6 @@
-package de.itg.wahlkampf.menu.element.elements;
+package de.itg.wahlkampf.menu.optionui.elements;
 
-import de.itg.wahlkampf.menu.Panel;
+import de.itg.wahlkampf.menu.optionui.Panel;
 import de.itg.wahlkampf.menu.element.AbstractElement;
 import de.itg.wahlkampf.setting.AbstractSetting;
 import de.itg.wahlkampf.setting.settings.SettingSlider;
@@ -9,7 +9,7 @@ import de.itg.wahlkampf.utilities.MathHelper;
 
 import java.awt.*;
 
-public class ElementSlider extends AbstractElement {
+public class ElementSlider extends AbstractElement{
     private final SettingSlider settingSlider;
     private final MathHelper mathHelper;
     private boolean dragging;

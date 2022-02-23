@@ -1,8 +1,8 @@
 package de.itg.wahlkampf.menu.menus;
 
 import de.itg.wahlkampf.Game;
-import de.itg.wahlkampf.menu.Button;
-import de.itg.wahlkampf.menu.Panel;
+import de.itg.wahlkampf.menu.optionui.Button;
+import de.itg.wahlkampf.menu.optionui.Panel;
 import de.itg.wahlkampf.object.AbstractPlayerObject;
 import de.itg.wahlkampf.utilities.Font;
 import de.itg.wahlkampf.utilities.Renderer;
@@ -12,7 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-public class FinishedMenu extends MouseAdapter {
+public class FinishedMenu extends MouseAdapter implements IMenu {
     private final Button quitButton;
     private int mouseX, mouseY;
     private final Panel panel;
@@ -28,12 +28,13 @@ public class FinishedMenu extends MouseAdapter {
         final int x = (Game.instance.getSize().width - width) / 2;
         final int centerY = (Game.instance.getSize().height - height) / 2;
 
-        quitButton = new de.itg.wahlkampf.menu.Button("QuitButton", "Quit Game", x, centerY, width, height, 30, true, true);
+        quitButton = new Button("QuitButton", "Quit Game", x, centerY, width, height, 30, true, true);
         panel = new Panel("Options", 50, 300);
         titleFont = new Font("Roboto", Font.BOLD, 32);
         renderer = Game.instance.getRenderer();
     }
 
+    @Override
     public void drawScreen(Graphics graphics) {
         if (!isVisible)
             return;

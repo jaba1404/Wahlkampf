@@ -13,10 +13,8 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 
 public abstract class AbstractPlayerObject extends AbstractGameObject {
@@ -96,9 +94,10 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         if (isBlocking() && canBlock()) {
             renderer.drawFillCircle(graphics, getPositionX() - 5, getPositionY() - 5, getWidth() + 10, getHeight() + 10, new Color(118, 231, 118, 150));
         }
-        if(facing.getHorizontalFactor() != 0) {
+        if (facing.getHorizontalFactor() != 0) {
             final AbstractGameObject below = getObjectStandingOn();
-            if(below != null) {
+            if (below != null) {
+                //
             }
         }
     }
@@ -107,6 +106,11 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         if (getPositionY() > 0) {
             setPositionY(getPositionY() - verticalMotion);
         }
+
+        if (isBlocking() && canBlock()) {
+            horizontalMotion /= 2;
+        }
+
         setPositionX(getPositionX() + horizontalMotion);
 
         if (!isOnGround()) {
@@ -172,7 +176,6 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
                 }
             } else if (Objects.equals(integer, keyBindMap.get(Action.BLOCK))) {
                 setBlocking(true);
-                setHorizontalMotion(getHorizontalMotion() / 2);
             } else if (Objects.equals(integer, keyBindMap.get(Action.FORWARDS))) {
                 setAttackFacing(Direction.RIGHT);
                 move(Direction.RIGHT);
@@ -221,13 +224,10 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         onGround = false;
         for (AbstractGameObject gameObject : Game.instance.getObjectHandler().getGameObjects()) {
             if (gameObject instanceof AbstractPlayerObject && gameObject != this) {
-                System.out.println(mathHelper.getDistanceTo(this, gameObject));
                 final AxisAligned objectsAxisAligned = new AxisAligned(gameObject.getPositionX(), gameObject.getPositionX() + gameObject.getWidth(), gameObject.getPositionY(), gameObject.getPositionY() + gameObject.getHeight());
-                System.out.println(direction);
                 switch (direction) {
                     case DOWN, UP -> {
                         if (playerAxisAligned.getMaxX() >= objectsAxisAligned.getMinX() && playerAxisAligned.getMinX() <= objectsAxisAligned.getMaxX()) {
-                            System.out.println("wdfadaw");
                             if (mathHelper.getDistanceTo(this, gameObject) <= distance) {
                                 return (AbstractPlayerObject) gameObject;
                             }
@@ -236,7 +236,6 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
                     case RIGHT -> {
                         if (getEyePosY() >= objectsAxisAligned.getMinY() && getEyePosY() <= objectsAxisAligned.getMaxY()) {
                             if (playerAxisAligned.getMaxX() >= objectsAxisAligned.getMinX() && playerAxisAligned.getMinX() + getWidth() / 2 <= objectsAxisAligned.getMaxX()) {
-                                System.out.println("dfawfawafafaw");
                                 return (AbstractPlayerObject) gameObject;
                             } else if (playerAxisAligned.getMaxX() <= objectsAxisAligned.getMinX()) {
                                 if (mathHelper.getDistanceTo(this, gameObject) <= distance) {
@@ -248,8 +247,6 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
                     case LEFT -> {
                         if (getEyePosY() >= objectsAxisAligned.getMinY() && getEyePosY() <= objectsAxisAligned.getMaxY()) {
                             if (playerAxisAligned.getMinX() <= objectsAxisAligned.getMaxX() && playerAxisAligned.getMaxX() - getWidth() / 2 >= objectsAxisAligned.getMinX()) {
-                                System.out.println("dfawfawafafaw");
-
                                 return (AbstractPlayerObject) gameObject;
                             } else if (playerAxisAligned.getMinX() >= objectsAxisAligned.getMaxX()) {
                                 if (mathHelper.getDistanceTo(this, gameObject) <= distance) {

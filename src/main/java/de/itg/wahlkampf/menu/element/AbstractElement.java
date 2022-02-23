@@ -1,7 +1,7 @@
 package de.itg.wahlkampf.menu.element;
 
 import de.itg.wahlkampf.Game;
-import de.itg.wahlkampf.menu.Panel;
+import de.itg.wahlkampf.menu.optionui.Panel;
 import de.itg.wahlkampf.setting.AbstractSetting;
 import de.itg.wahlkampf.utilities.Renderer;
 

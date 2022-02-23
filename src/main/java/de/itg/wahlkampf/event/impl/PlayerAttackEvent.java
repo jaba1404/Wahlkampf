@@ -1,9 +1,9 @@
 package de.itg.wahlkampf.event.impl;
 
-import de.itg.wahlkampf.event.Event;
+import de.itg.wahlkampf.event.AbstractEvent;
 import de.itg.wahlkampf.object.AbstractGameObject;
 
-public class PlayerAttackEvent extends Event {
+public class PlayerAttackEvent extends AbstractEvent {
     private final AbstractGameObject gameObject;
 
     public PlayerAttackEvent(AbstractGameObject gameObject) {

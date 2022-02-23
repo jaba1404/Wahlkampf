@@ -1,6 +1,6 @@
 package de.itg.wahlkampf.event;
 
-public class Event {
+public abstract class AbstractEvent {
     private boolean cancelled;
 
     public boolean isCancelled() {

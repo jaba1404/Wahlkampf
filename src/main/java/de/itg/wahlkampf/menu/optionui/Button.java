@@ -1,4 +1,4 @@
-package de.itg.wahlkampf.menu;
+package de.itg.wahlkampf.menu.optionui;
 
 import de.itg.wahlkampf.Game;
 import de.itg.wahlkampf.utilities.Font;
@@ -12,7 +12,7 @@ public class Button {
     private String id, text;
     private boolean visible, enabled;
     private final Renderer renderer;
-    private final Font buttonFont ;
+    private final Font buttonFont;
 
     public Button(String id, String text, int x, int y, int width, int height, int fontSize, boolean visible, boolean enabled) {
         this.renderer = Game.instance.getRenderer();
@@ -76,10 +76,6 @@ public class Button {
         return text;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
-
     public void setHeight(int height) {
         this.height = height;
     }
@@ -88,17 +84,11 @@ public class Button {
         return enabled;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public boolean isVisible() {
         return visible;
