@@ -1,13 +1,15 @@
-package de.itg.wahlkampf.menu.element;
+package de.itg.wahlkampf.menu.optionui.element;
 
 import de.itg.wahlkampf.Game;
+import de.itg.wahlkampf.menu.menus.IMenu;
+import de.itg.wahlkampf.menu.optionui.IComponent;
 import de.itg.wahlkampf.menu.optionui.Panel;
 import de.itg.wahlkampf.setting.AbstractSetting;
 import de.itg.wahlkampf.utilities.Renderer;
 
 import java.awt.*;
 
-public abstract class AbstractElement {
+public abstract class AbstractElement  {
     private final Renderer renderer;
     private final Panel panel;
     private int x,y;
@@ -32,6 +34,7 @@ public abstract class AbstractElement {
     public abstract void mousePressed(int mouseX, int mouseY, int mouseButton);
 
     public abstract void mouseReleased(int mouseX, int mouseY);
+
 
     public abstract int getHeight();
 

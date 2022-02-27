@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 public class Game extends Canvas implements Runnable {
     public static final String GAME_TITLE = "Wahlkampf";
     public static final String GAME_VERSION = "Alpha 1.0.0";
-    private static final Dimension GAME_DIMENSION = new Dimension(1280, 720);
+    public static final Dimension GAME_DIMENSION = new Dimension(1280, 720);
     private static final double UPDATE_CAP = 1.0 / 60.0;
     public static Game instance;
 
@@ -43,6 +43,7 @@ public class Game extends Canvas implements Runnable {
     private final Window window;
     private final Renderer renderer;
     private final ParticleHandler particleHandler;
+    private final InputListener inputListener;
     private final SettingManager settingManager;
     private final SoundHelper soundHelper;
     private MainMenu menu;
@@ -56,12 +57,14 @@ public class Game extends Canvas implements Runnable {
     private final SettingComboBox stageSetting;
     private final Map<String, URL> backgroundMap;
     private URL backgroundFile;
+    private net.java.games.input.Event controllerEvent;
 
     private float framesPerSecond = 60;
     private final Font textFont = new Font("Roboto", Font.PLAIN, 12);
 
     public Game() {
         instance = this;
+        inputListener = new InputListener(this);
         soundHelper = new SoundHelper();
         backgroundMap = Stream.of(new Object[][]{
                 {"White House", getClass().getResource("assets/hintergrund 1.gif")},
@@ -75,7 +78,7 @@ public class Game extends Canvas implements Runnable {
         backgroundFile = backgroundMap.get(stageSetting.getCurrentOption());
 
         renderer = new Renderer();
-        this.addKeyListener(new InputListener(this));
+        this.addKeyListener(inputListener);
         window = new Window(GAME_TITLE, GAME_DIMENSION.width, GAME_DIMENSION.height, this);
         objectHandler = new ObjectHandler();
         menu = new MainMenu();
@@ -146,7 +149,6 @@ public class Game extends Canvas implements Runnable {
                 if (startGame.isActive())
                     onTick();
             }
-
             if (render) {
                 //Render game
                 onRender();
@@ -182,22 +184,22 @@ public class Game extends Canvas implements Runnable {
                 finishedMenu.setVisible(true);
             }
         }
-        if (abstractEvent instanceof AddPlayerObjectsEvent) {
-            ingameMenu = new InGameMenu(((AddPlayerObjectsEvent) abstractEvent).getAbstractGameObjects());
+        if (abstractEvent instanceof AddGameObjectsEvent) {
+            ingameMenu = new InGameMenu(((AddGameObjectsEvent) abstractEvent).getPlayerObjects());
         }
-        if(abstractEvent instanceof PlayerAttackEvent) {
+        if (abstractEvent instanceof PlayerAttackEvent) {
             soundHelper.playMusic(Sound.HIT.getLocation());
         }
         if (abstractEvent instanceof PlayerJumpEvent) {
             soundHelper.playMusic(Sound.JUMP.getLocation());
         }
-        if(abstractEvent instanceof PlayerBlockEvent) {
+        if (abstractEvent instanceof PlayerBlockEvent) {
             soundHelper.playMusic(Sound.BLOCK.getLocation());
         }
     }
 
     private void onRender() {
-        BufferStrategy bufferStrategy = this.getBufferStrategy();
+       final BufferStrategy bufferStrategy = this.getBufferStrategy();
         if (bufferStrategy == null) {
             this.createBufferStrategy(3);
             return;

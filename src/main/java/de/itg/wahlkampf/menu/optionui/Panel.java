@@ -1,10 +1,10 @@
 package de.itg.wahlkampf.menu.optionui;
 
 import de.itg.wahlkampf.Game;
-import de.itg.wahlkampf.menu.element.AbstractElement;
-import de.itg.wahlkampf.menu.optionui.elements.ElementCheckBox;
-import de.itg.wahlkampf.menu.optionui.elements.ElementComboBox;
-import de.itg.wahlkampf.menu.optionui.elements.ElementSlider;
+import de.itg.wahlkampf.menu.optionui.element.AbstractElement;
+import de.itg.wahlkampf.menu.optionui.element.elements.ElementCheckBox;
+import de.itg.wahlkampf.menu.optionui.element.elements.ElementComboBox;
+import de.itg.wahlkampf.menu.optionui.element.elements.ElementSlider;
 import de.itg.wahlkampf.setting.settings.SettingCheckBox;
 import de.itg.wahlkampf.setting.settings.SettingComboBox;
 import de.itg.wahlkampf.setting.settings.SettingSlider;

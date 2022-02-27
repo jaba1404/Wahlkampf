@@ -28,7 +28,7 @@ public class TrumpPlayer extends AbstractPlayerObject {
     public void attack(AbstractPlayerObject enemy) {
         if (!enemy.isBlocking() || !enemy.canBlock()) {
             enemy.addDamage(5, this);
-            enemy.setVerticalMotion(enemy.getVerticalMotion() + 20);
+            enemy.setVerticalMotion(enemy.getVerticalMotion() + 15);
         } else {
             enemy.setVerticalMotion(enemy.getVerticalMotion() + 5);
         }

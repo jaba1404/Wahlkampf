@@ -1,7 +1,7 @@
 package de.itg.wahlkampf.menu.menus;
 
 import de.itg.wahlkampf.Game;
-import de.itg.wahlkampf.menu.optionui.Button;
+import de.itg.wahlkampf.menu.Button;
 import de.itg.wahlkampf.menu.optionui.Panel;
 import de.itg.wahlkampf.setting.settings.SettingCheckBox;
 import de.itg.wahlkampf.setting.settings.SettingComboBox;
@@ -14,9 +14,9 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 public class MainMenu extends MouseAdapter implements IMenu {
-    private final Button startButton;
-    private final Button optionButton;
-    private final Button quitButton;
+    private final de.itg.wahlkampf.menu.Button startButton;
+    private final de.itg.wahlkampf.menu.Button optionButton;
+    private final de.itg.wahlkampf.menu.Button quitButton;
     private int mouseX, mouseY;
     private final Panel panel;
     private final SettingCheckBox startGame;
@@ -30,8 +30,8 @@ public class MainMenu extends MouseAdapter implements IMenu {
     public MainMenu() {
         final int x = (Game.instance.getSize().width - width) / 2;
         final int centerY = (Game.instance.getSize().height - height) / 2;
-        startButton = new Button("StartButton", "Start Game", x, centerY - 60, width, height, 30, true, true);
-        optionButton = new Button("OptionButton", "Options", x, centerY, width, height, 30, true, true);
+        startButton = new de.itg.wahlkampf.menu.Button("StartButton", "Start Game", x, centerY - 60, width, height, 30, true, true);
+        optionButton = new de.itg.wahlkampf.menu.Button("OptionButton", "Options", x, centerY, width, height, 30, true, true);
         quitButton = new Button("QuitButton", "Quit Game", x, centerY + 60, width, height, 30, true, true);
         startGame = (SettingCheckBox) Game.instance.getSettingManager().getSettingByName("Start Game");
         panel = new Panel("Options", 50, 300);
@@ -63,7 +63,7 @@ public class MainMenu extends MouseAdapter implements IMenu {
             for (int i = 0; i < Game.instance.getPlayerAmount(); i++) {
                 players.add(((SettingComboBox) Game.instance.getSettingManager().getSettingByName("Player " + i)).getCurrentOption());
             }
-            Game.instance.getObjectHandler().addPlayerObjects(players.toArray(new String[0]));
+            Game.instance.getObjectHandler().addGameObjects(players.toArray(new String[0]));
             startGame.setActive(true);
         }
         if (optionButton.canClick(mouseX, mouseY)) {

@@ -1,7 +1,7 @@
-package de.itg.wahlkampf.menu.optionui.elements;
+package de.itg.wahlkampf.menu.optionui.element.elements;
 
 import de.itg.wahlkampf.menu.optionui.Panel;
-import de.itg.wahlkampf.menu.element.AbstractElement;
+import de.itg.wahlkampf.menu.optionui.element.AbstractElement;
 import de.itg.wahlkampf.setting.AbstractSetting;
 import de.itg.wahlkampf.setting.settings.SettingSlider;
 import de.itg.wahlkampf.utilities.Font;
@@ -9,7 +9,7 @@ import de.itg.wahlkampf.utilities.MathHelper;
 
 import java.awt.*;
 
-public class ElementSlider extends AbstractElement{
+public class ElementSlider extends AbstractElement {
     private final SettingSlider settingSlider;
     private final MathHelper mathHelper;
     private boolean dragging;
@@ -39,8 +39,8 @@ public class ElementSlider extends AbstractElement{
     public void mousePressed(int mouseX, int mouseY, int mouseButton) {
         if (!settingSlider.canRender() || !settingSlider.isShowInOptions())
             return;
-        if (mouseX >= getX() && mouseX < getX() + 100 && mouseY >= getY() && mouseY < getY() + getHeight()) {
-            if (mouseButton == 1) {
+        if (mouseButton == 1) {
+            if (mouseX >= getX() && mouseX < getX() + 100 && mouseY >= getY() && mouseY < getY() + getHeight()) {
                 dragging = true;
             }
         }

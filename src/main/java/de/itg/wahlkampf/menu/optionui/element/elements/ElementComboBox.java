@@ -1,7 +1,7 @@
-package de.itg.wahlkampf.menu.optionui.elements;
+package de.itg.wahlkampf.menu.optionui.element.elements;
 
 import de.itg.wahlkampf.menu.optionui.Panel;
-import de.itg.wahlkampf.menu.element.AbstractElement;
+import de.itg.wahlkampf.menu.optionui.element.AbstractElement;
 import de.itg.wahlkampf.setting.AbstractSetting;
 import de.itg.wahlkampf.setting.settings.SettingComboBox;
 import de.itg.wahlkampf.utilities.Font;
@@ -39,16 +39,15 @@ public class ElementComboBox extends AbstractElement {
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (!settingComboBox.canRender() || !settingComboBox.isShowInOptions())
             return;
-
         if (mouseX >= getX() && mouseX < getX() + 100 && mouseY >= getY() && mouseY < getY() + getHeight()) {
-            if (mouseButton == 1) {
-                int y = getY();
-                if (mouseY >= y && mouseY < y + originalHeight) {
-                    extended = !extended;
-                    return;
-                }
-                y += distance;
-                if (extended) {
+            int y = getY();
+            if (mouseY >= y && mouseY < y + originalHeight) {
+                extended = !extended;
+                return;
+            }
+            y += distance;
+            if (extended) {
+                if (mouseButton == 1) {
                     for (String option : settingComboBox.getOptions()) {
                         if (mouseY >= y && mouseY < y + distance) {
                             settingComboBox.setCurrentOption(option);
@@ -57,9 +56,10 @@ public class ElementComboBox extends AbstractElement {
                         y += distance;
                     }
                 }
-            }
         }
     }
+
+}
 
     @Override
     public void mousePressed(int mouseX, int mouseY, int mouseButton) {

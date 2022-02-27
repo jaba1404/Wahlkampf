@@ -1,4 +1,4 @@
-package de.itg.wahlkampf.menu.optionui;
+package de.itg.wahlkampf.menu;
 
 import de.itg.wahlkampf.Game;
 import de.itg.wahlkampf.utilities.Font;

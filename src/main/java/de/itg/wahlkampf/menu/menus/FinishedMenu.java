@@ -1,7 +1,7 @@
 package de.itg.wahlkampf.menu.menus;
 
 import de.itg.wahlkampf.Game;
-import de.itg.wahlkampf.menu.optionui.Button;
+import de.itg.wahlkampf.menu.Button;
 import de.itg.wahlkampf.menu.optionui.Panel;
 import de.itg.wahlkampf.object.AbstractPlayerObject;
 import de.itg.wahlkampf.utilities.Font;
@@ -13,7 +13,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 public class FinishedMenu extends MouseAdapter implements IMenu {
-    private final Button quitButton;
+    private final de.itg.wahlkampf.menu.Button quitButton;
     private int mouseX, mouseY;
     private final Panel panel;
     private final int width = 200;
