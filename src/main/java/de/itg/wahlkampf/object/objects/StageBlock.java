@@ -10,7 +10,7 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
 public class StageBlock extends AbstractGameObject {
-    private Color color;
+    private final Color color;
     private final BufferedImage[] bufferedImage;
     private final Renderer renderer;
 

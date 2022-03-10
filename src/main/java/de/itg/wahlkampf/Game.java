@@ -206,8 +206,8 @@ public class Game extends Canvas implements Runnable {
         }
 
         final Graphics graphics = bufferStrategy.getDrawGraphics();
-        final Image image = new ImageIcon(backgroundFile).getImage();
-        renderer.img(graphics, image, 0, 0, GAME_DIMENSION.width, GAME_DIMENSION.height);
+        final Image background = new ImageIcon(backgroundFile).getImage();
+        renderer.img(graphics, background, 0, 0, GAME_DIMENSION.width, GAME_DIMENSION.height);
 
         renderer.textWithShadow(graphics, GAME_TITLE, 1, 10, Color.white, textFont);
         renderer.textWithShadow(graphics, "FPS: " + framesPerSecond, 1, 25, Color.white, textFont);

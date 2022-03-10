@@ -34,8 +34,9 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     private final MathHelper mathHelper;
     private final PlayerJumpEvent playerJumpEvent;
     private final PlayerAttackEvent playerAttackEvent;
-
     private final TimeHelper timeHelper;
+    private final Renderer renderer;
+
     private boolean onGround;
     private boolean jump;
     private boolean attack;
@@ -52,7 +53,6 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     private BufferedImage bufferedImage;
     private BufferedImage bufferedImageFlipH;
     private BufferedImage bufferedImageFlipV;
-    private final Renderer renderer;
     private AbstractPlayerObject lastDamageSource;
     private final int spawnHealth, spawnY;
     private int verticalMotion;
@@ -91,8 +91,7 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     public void onRender(Graphics graphics) {
         final BufferedImage player = facing == Direction.RIGHT ? bufferedImage : bufferedImageFlipH;
         renderer.img(graphics, player, getPositionX(), getPositionY(), getWidth(), getHeight());
-        renderer.drawCircle(graphics, getPositionX(), getEyePosY(), 5, 5, Color.RED);
-        if (isBlocking() && canBlock()) {
+       if (isBlocking() && canBlock()) {
             renderer.drawFillCircle(graphics, getPositionX() - 5, getPositionY() - 5, getWidth() + 10, getHeight() + 10, new Color(118, 231, 118, 150));
         }
         if (facing.getHorizontalFactor() != 0) {
