@@ -146,9 +146,13 @@ public class Game extends Canvas implements Runnable {
                         System.out.println("Cleared!");
                     }
                 }
-                if (startGame.isActive())
+                if (startGame.isActive()) {
                     onTick();
+                    objectHandler.getGameObjects().removeIf(AbstractGameObject::isDeleted);
+                }
             }
+            if (objectHandler != null)
+                System.out.println(objectHandler.getGameObjects().size());
             if (render) {
                 //Render game
                 onRender();
@@ -167,7 +171,7 @@ public class Game extends Canvas implements Runnable {
     private void onTick() {
         if (objectHandler == null)
             return;
-        objectHandler.getGameObjects().forEach(AbstractGameObject::onTick);
+        objectHandler.getGameObjects().stream().filter(gameObject -> !gameObject.isDeleted()).forEach(AbstractGameObject::onTick);
     }
 
     public void onEvent(AbstractEvent abstractEvent) {
@@ -182,6 +186,7 @@ public class Game extends Canvas implements Runnable {
                 finishedMenu.setAbstractPlayerObject((AbstractPlayerObject) ((GameFinishedEvent) abstractEvent).getWinner());
                 soundHelper.playMusic(Sound.FINISHED.getLocation());
                 finishedMenu.setVisible(true);
+                getObjectHandler().getGameObjects().stream().filter(gameObject -> gameObject instanceof AbstractPlayerObject).forEach(AbstractGameObject::deleteObject);
             }
         }
         if (abstractEvent instanceof AddGameObjectsEvent) {
@@ -199,7 +204,7 @@ public class Game extends Canvas implements Runnable {
     }
 
     private void onRender() {
-       final BufferStrategy bufferStrategy = this.getBufferStrategy();
+        final BufferStrategy bufferStrategy = this.getBufferStrategy();
         if (bufferStrategy == null) {
             this.createBufferStrategy(3);
             return;
@@ -219,13 +224,13 @@ public class Game extends Canvas implements Runnable {
         if (objectHandler == null)
             return;
         if (startGame.isActive()) {
-            for (AbstractGameObject gameObject : objectHandler.getGameObjects()) {
+            objectHandler.getGameObjects().stream().filter(gameObject -> !gameObject.isDeleted()).forEach(gameObject -> {
                 gameObject.onRender(graphics);
-                if (gameObject.getType() == Type.PLAYER) {
+                if (gameObject instanceof AbstractPlayerObject) {
                     ingameMenu.drawScreen(graphics);
                     renderer.textWithShadow(graphics, gameObject.getName() + " hp: " + ((AbstractPlayerObject) gameObject).getHealthPoints(), gameObject.getPositionX(), gameObject.getPositionY(), Color.WHITE, textFont);
                 }
-            }
+            });
             menu = null;
         }
 
@@ -235,7 +240,7 @@ public class Game extends Canvas implements Runnable {
             }
         }
 
-        if (finishedMenu.isVisible()) {
+        if (finishedMenu != null && finishedMenu.isVisible()) {
             finishedMenu.drawScreen(graphics);
         }
         graphics.dispose();

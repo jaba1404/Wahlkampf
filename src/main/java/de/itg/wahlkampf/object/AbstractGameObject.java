@@ -1,5 +1,8 @@
 package de.itg.wahlkampf.object;
 
+import de.itg.wahlkampf.Game;
+import de.itg.wahlkampf.utilities.Renderer;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
@@ -8,6 +11,8 @@ public abstract class AbstractGameObject {
     private Type type;
     private int positionX, positionY, width, height;
     private boolean passThrough;
+    private boolean deleted;
+    private final Renderer renderer;
 
     public AbstractGameObject(String name, Type type, int positionX, int positionY, int width, int height, boolean passTrough) {
         this.name = name;
@@ -17,15 +22,13 @@ public abstract class AbstractGameObject {
         this.width = width;
         this.height = height;
         this.passThrough = passTrough;
+        renderer = Game.instance.getRenderer();
     }
 
     public abstract void onRender(Graphics graphics);
 
     public abstract void onTick();
 
-    public abstract void onKeyPressed(KeyEvent e);
-
-    public abstract void keyReleased(KeyEvent e);
 
     public String getName() {
         return name;
@@ -81,5 +84,17 @@ public abstract class AbstractGameObject {
 
     public void setHeight(int height) {
         this.height = height;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void deleteObject() {
+        this.deleted = true;
+    }
+
+    public Renderer getRenderer() {
+        return renderer;
     }
 }

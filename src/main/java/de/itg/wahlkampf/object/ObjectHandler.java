@@ -2,9 +2,10 @@ package de.itg.wahlkampf.object;
 
 import de.itg.wahlkampf.Game;
 import de.itg.wahlkampf.event.impl.AddGameObjectsEvent;
-import de.itg.wahlkampf.object.objects.StageBlock;
-import de.itg.wahlkampf.object.players.MerkelPlayer;
-import de.itg.wahlkampf.object.players.TrumpPlayer;
+import de.itg.wahlkampf.object.objects.blocks.StageBlock;
+import de.itg.wahlkampf.object.objects.items.StrengthItem;
+import de.itg.wahlkampf.object.objects.players.MerkelPlayer;
+import de.itg.wahlkampf.object.objects.players.TrumpPlayer;
 import de.itg.wahlkampf.setting.settings.SettingComboBox;
 import de.itg.wahlkampf.utilities.MathHelper;
 
@@ -54,6 +55,8 @@ public class ObjectHandler {
             x += mathHelper.getRandomInt(width + 100, width + 200);
             x2 += mathHelper.getRandomInt(width2 + 100, width2 + 200);
         }
+        addObject(new StrengthItem(60, 60));
+        addObject(new StrengthItem(100, 60));
 
         for (int i = 0; i < players.length; i++) {
             final String s = players[i];
@@ -62,7 +65,7 @@ public class ObjectHandler {
                 case "Trump" -> addObject(new TrumpPlayer(i));
             }
         }
-        final AddGameObjectsEvent addGameObjectsEvent = new AddGameObjectsEvent(gameObjects.stream().filter(abstractGameObject -> abstractGameObject.getType() == Type.PLAYER).collect(Collectors.toList()));
+        final AddGameObjectsEvent addGameObjectsEvent = new AddGameObjectsEvent(gameObjects.stream().filter(abstractGameObject -> abstractGameObject instanceof AbstractPlayerObject).collect(Collectors.toList()));
         Game.instance.onEvent(addGameObjectsEvent);
     }
 

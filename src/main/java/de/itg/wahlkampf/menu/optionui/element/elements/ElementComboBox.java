@@ -29,7 +29,7 @@ public class ElementComboBox extends AbstractElement {
         y += distance;
         if (extended) {
             for (String option : settingComboBox.getOptions()) {
-                getRenderer().textWithShadow(graphics, option, (int) (getX() + 100 / 2 - textFont.getStringSize(option).getWidth() / 2), y + (distance + (int) textFont.getStringSize(option).getHeight() / 2) / 2, settingComboBox.getCurrentOption().equals(option) ? new Color(255, 255, 255, 255) : new Color(230, 230, 230, 255), textFont);
+                getRenderer().textWithShadow(graphics, option, (int) (getX() + 100 / 2 - textFont.getStringSize(option).getWidth() / 2), y + (distance + (int) textFont.getStringSize(option).getHeight() / 2) / 2, settingComboBox.getCurrentOption().equals(option) ? new Color(255, 255, 255, 255) : new Color(220, 220, 220, 220), textFont);
                 y += distance;
             }
         }

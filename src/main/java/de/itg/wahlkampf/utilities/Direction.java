@@ -8,8 +8,8 @@ public enum Direction {
     DOWN(-1, 0),
     ;
 
-    private final int verticalFactor;
-    private final int horizontalFactor;
+    private int verticalFactor;
+    private int horizontalFactor;
 
     Direction(int verticalFactor, int horizontalFactor) {
         this.verticalFactor = verticalFactor;
@@ -18,6 +18,14 @@ public enum Direction {
 
     public int getVerticalFactor() {
         return verticalFactor;
+    }
+
+    public void setVerticalFactor(int verticalFactor) {
+        this.verticalFactor = verticalFactor;
+    }
+
+    public void setHorizontalFactor(int horizontalFactor) {
+        this.horizontalFactor = horizontalFactor;
     }
 
     public int getHorizontalFactor() {

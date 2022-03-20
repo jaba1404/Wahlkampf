@@ -23,7 +23,7 @@ public class ElementCheckBox extends AbstractElement {
         getRenderer().drawFillRectangle(graphics, getX(), getY(), width, getHeight(), new Color(255, 255, 255, 100));
         final String settingName = getSetting().getName() + ": ";
         final Rectangle2D fontSize = textFont.getStringSize(settingName);
-        getRenderer().textWithShadow(graphics, settingName + setting.isActive(), getX(), getY() + (getHeight() + (int) fontSize.getHeight() / 2) / 2, new Color(230, 230, 230, 255), textFont);
+        getRenderer().textWithShadow(graphics, settingName + setting.isActive(), getX(), getY() + (getHeight() + (int) fontSize.getHeight() / 2) / 2, new Color(220, 220, 220, 255), textFont);
     }
 
     @Override

@@ -10,6 +10,7 @@ public class Font extends java.awt.Font {
 
     private final AffineTransform affinetransform;
     private final FontRenderContext frc;
+
     public Font(String fontName, int type, int size) {
         super(fontName, type, size);
         this.affinetransform = new AffineTransform();
@@ -20,6 +21,7 @@ public class Font extends java.awt.Font {
     public Rectangle2D getStringSize(String text) {
         return font.getStringBounds(text, frc);
     }
+
     public AffineTransform getAffinetransform() {
         return affinetransform;
     }
