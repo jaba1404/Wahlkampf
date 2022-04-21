@@ -23,13 +23,13 @@ public class ElementComboBox extends AbstractElement {
     @Override
     public void drawScreen(Graphics graphics, int mouseX, int mouseY) {
         int y = getY();
-        getRenderer().drawFillRectangle(graphics, getX(), getY(), 100, getHeight(), new Color(255, 255, 255, 100));
+        getRenderer().drawFillRectangle(graphics, getX(), getY(), getWidth(), getHeight(), new Color(255, 255, 255, 100));
         final String name = settingComboBox.getName() + ":";
         getRenderer().textWithShadow(graphics, name, getX(), getY() + (distance + (int) textFont.getStringSize(name).getHeight() / 2) / 2, new Color(230, 230, 230, 255), textFont);
         y += distance;
         if (extended) {
             for (String option : settingComboBox.getOptions()) {
-                getRenderer().textWithShadow(graphics, option, (int) (getX() + 100 / 2 - textFont.getStringSize(option).getWidth() / 2), y + (distance + (int) textFont.getStringSize(option).getHeight() / 2) / 2, settingComboBox.getCurrentOption().equals(option) ? new Color(255, 255, 255, 255) : new Color(220, 220, 220, 220), textFont);
+                getRenderer().textWithShadow(graphics, option, (int) (getX() + getWidth() / 2 - textFont.getStringSize(option).getWidth() / 2), y + (distance + (int) textFont.getStringSize(option).getHeight() / 2) / 2, settingComboBox.getCurrentOption().equals(option) ? new Color(255, 255, 255, 255) : new Color(220, 220, 220, 220), textFont);
                 y += distance;
             }
         }
@@ -39,7 +39,7 @@ public class ElementComboBox extends AbstractElement {
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (!settingComboBox.canRender() || !settingComboBox.isShowInOptions())
             return;
-        if (mouseX >= getX() && mouseX < getX() + 100 && mouseY >= getY() && mouseY < getY() + getHeight()) {
+        if (mouseX >= getX() && mouseX < getX() + getWidth() && mouseY >= getY() && mouseY < getY() + getHeight()) {
             int y = getY();
             if (mouseY >= y && mouseY < y + originalHeight) {
                 extended = !extended;

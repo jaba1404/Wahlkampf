@@ -10,7 +10,6 @@ import java.awt.geom.Rectangle2D;
 
 public class ElementCheckBox extends AbstractElement {
     private final SettingCheckBox setting;
-    private final int width = 100;
     private final Font textFont = new Font("Roboto", Font.BOLD, 14);
 
     public ElementCheckBox(Panel panel, SettingCheckBox setting) {
@@ -20,7 +19,7 @@ public class ElementCheckBox extends AbstractElement {
 
     @Override
     public void drawScreen(Graphics graphics, int mouseX, int mouseY) {
-        getRenderer().drawFillRectangle(graphics, getX(), getY(), width, getHeight(), new Color(255, 255, 255, 100));
+        getRenderer().drawFillRectangle(graphics, getX(), getY(), getWidth(), getHeight(), new Color(255, 255, 255, 100));
         final String settingName = getSetting().getName() + ": ";
         final Rectangle2D fontSize = textFont.getStringSize(settingName);
         getRenderer().textWithShadow(graphics, settingName + setting.isActive(), getX(), getY() + (getHeight() + (int) fontSize.getHeight() / 2) / 2, new Color(220, 220, 220, 255), textFont);
@@ -31,7 +30,7 @@ public class ElementCheckBox extends AbstractElement {
         if (!setting.canRender() || !getSetting().isShowInOptions())
             return;
         if (mouseButton == 1) {
-            if (mouseX <= getX() + width && mouseX > getX() && mouseY <= getY() + getHeight() && mouseY > getY()) {
+            if (mouseX <= getX() + getWidth() && mouseX > getX() && mouseY <= getY() + getHeight() && mouseY > getY()) {
                 setting.setActive(!setting.isActive());
             }
         }

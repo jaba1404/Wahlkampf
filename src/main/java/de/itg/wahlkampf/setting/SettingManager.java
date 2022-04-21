@@ -12,15 +12,14 @@ public class SettingManager {
     private final List<AbstractSetting> settingList = new ArrayList<>();
 
     public SettingManager() {
-        settingList.add(new SettingCheckBox("Test 1", false));
         settingList.add(new SettingCheckBox("Start Game", false, false));
-        settingList.add(new SettingCheckBox("Pause Game", false, false));
-        settingList.add(new SettingCheckBox("Test 2", true));
         settingList.add(new SettingComboBox("Stage", Game.instance.getBackgroundMap().keySet().toArray(new String[0]), Game.instance.getBackgroundMap().keySet().toArray(new String[0])[0], true));
         for (int i = 0; i < Game.instance.getPlayerAmount(); i++) {
             settingList.add(new SettingComboBox("Player " + i, Game.instance.getPlayerNames().toArray(new String[0]), Game.instance.getPlayerNames().get(0), true));
         }
-        settingList.add(new SettingSlider("Test 2", 1, 10, 5, 0.5, true));
+        settingList.add(new SettingSlider("Knockback Modifier X", 0,50,19,1));
+        settingList.add(new SettingSlider("Knockback Modifier Y", 0,50,15,1));
+        settingList.add(new SettingCheckBox("Show FPS",false));
     }
 
     public AbstractSetting getSettingByName(String name) {

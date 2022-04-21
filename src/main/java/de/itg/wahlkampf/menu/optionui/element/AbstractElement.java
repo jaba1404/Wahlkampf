@@ -9,10 +9,10 @@ import de.itg.wahlkampf.utilities.Renderer;
 
 import java.awt.*;
 
-public abstract class AbstractElement  {
+public abstract class AbstractElement {
     private final Renderer renderer;
     private final Panel panel;
-    private int x,y;
+    private int x, y;
 
     public AbstractElement(Panel panel) {
         this.panel = panel;
@@ -54,6 +54,10 @@ public abstract class AbstractElement  {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    public int getWidth() {
+        return 200;
     }
 
     public Renderer getRenderer() {

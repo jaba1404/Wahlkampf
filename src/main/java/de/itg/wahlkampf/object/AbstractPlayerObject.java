@@ -1,6 +1,7 @@
 package de.itg.wahlkampf.object;
 
 import de.itg.wahlkampf.Game;
+import de.itg.wahlkampf.effect.AbstractEffect;
 import de.itg.wahlkampf.event.impl.GameFinishedEvent;
 import de.itg.wahlkampf.event.impl.PlayerAttackEvent;
 import de.itg.wahlkampf.event.impl.PlayerBlockEvent;
@@ -8,6 +9,7 @@ import de.itg.wahlkampf.event.impl.PlayerJumpEvent;
 import de.itg.wahlkampf.object.boundingbox.AxisAligned;
 import de.itg.wahlkampf.utilities.*;
 import de.itg.wahlkampf.utilities.character.PlayerImage;
+import de.itg.wahlkampf.utilities.inputhandling.KeyboardListener;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 
@@ -20,10 +22,13 @@ import java.util.*;
 
 public abstract class AbstractPlayerObject extends AbstractGameObject {
 
-    private static final int INITIAL_LIVES = 3;
+    public static final int INITIAL_LIVES = 3;
     private static final int INITIAL_BLOCKS = 3;
     private static final int MAX_AIR_JUMPS = 3;
     private static final long BLOCK_DELAY = 2000;
+    private static final int MAX_SPEED = 6;
+
+    private final List<AbstractEffect> effectList;
 
     private final Movement movement;
     private final MathHelper mathHelper;
@@ -39,15 +44,19 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     private boolean attacking;
     private boolean blocking;
     private int weight;
-    private Map<String, PlayerImage> imageMap;
+    private final Map<String, PlayerImage> imageMap;
     private int healthPoints;
     private int lives = INITIAL_LIVES;
     private int blockCounter;
     private final int id;
+    private final Color color;
     private Direction facing = Direction.RIGHT;
     private Direction attackFacing = Direction.RIGHT;
     private AbstractPlayerObject lastDamageSource;
     private final int spawnHealth, spawnY;
+    private int strength;
+    private final int baseStrength;
+    private final int baseHealthPoints;
     private int verticalMotion;
     private int horizontalMotion;
     private int jumpCounter;
@@ -55,27 +64,45 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     private final int difference;
 
     private final Map<Action, KeyBind> keyBindMap;
+    private final List<Component> componentList;
+    private Controller controller;
 
-    public AbstractPlayerObject(String name, Map<String, PlayerImage> imageMap, int id, int healthPoints, int weight, int positionX, int positionY, int width, int height) {
+    public AbstractPlayerObject(String name, Map<String, PlayerImage> imageMap, int id, int healthPoints, int strength, int weight, int positionX, int positionY, int width, int height) {
         super(name, Type.COLLIDABLE, positionX, positionY, width, height, true);
         this.timeHelper = new TimeHelper();
         this.attackTimeHelper = new TimeHelper();
         this.keyBindMap = new HashMap<>();
         this.imageMap = imageMap;
         this.id = id;
-        this.healthPoints = healthPoints;
+        this.healthPoints = this.baseHealthPoints = healthPoints;
         this.movement = new Movement();
         this.mathHelper = new MathHelper();
         this.spawnHealth = healthPoints;
         this.spawnY = positionY;
+        this.strength = this.baseStrength = strength;
+
+        effectList = new ArrayList<>();
+        componentList = new ArrayList<>();
+
         playerAttackEvent = new PlayerAttackEvent(this);
         playerJumpEvent = new PlayerJumpEvent(this);
+
         addKeyBinds();
+
+        switch (id) {
+            case 0 -> color = Color.BLUE;
+            case 1 -> color = Color.RED;
+            case 2 -> color = Color.GREEN;
+            case 3 -> color = Color.YELLOW;
+            case 4 -> color = Color.MAGENTA;
+            default -> color = Color.WHITE;
+        }
 
         difference = Math.abs(imageMap.get("hit").getBufferedImage().getWidth() - imageMap.get("stand").getBufferedImage().getWidth());
     }
 
-    public abstract void attack(AbstractPlayerObject enemy);
+    /* onAttack Methode Abstract, damit jeder Charakter später eventuelle individuelle Special-Attacks bekommen kann  */
+    public abstract void onAttack(AbstractPlayerObject enemy);
 
     @Override
     public void onRender(Graphics graphics) {
@@ -103,6 +130,11 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         if (getPositionY() > Game.GAME_DIMENSION.height + 500) {
             respawnPlayer();
             return;
+        }
+        if (horizontalMotion > 0) {
+            setFacing(Direction.RIGHT);
+        } else if (horizontalMotion < 0) {
+            setFacing(Direction.LEFT);
         }
 
         setPositionX(getPositionX() + horizontalMotion);
@@ -133,18 +165,6 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
             jumpCounter = 0;
         }
 
-        if (!InputListener.KEY_LIST.contains(keyBindMap.get(Action.ATTACK).getKeyCode())) {
-            canAttack = true;
-        }
-
-        if (!InputListener.KEY_LIST.contains(keyBindMap.get(Action.CLIP).getKeyCode())) {
-            canClip = true;
-        }
-
-        if (!InputListener.KEY_LIST.contains(keyBindMap.get(Action.JUMP).getKeyCode())) {
-            canJump = true;
-        }
-
         setBlocking(false);
 
         if (canAttack || attacking && attackTimeHelper.hasPassed(200)) {
@@ -152,119 +172,12 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
             attackTimeHelper.reset();
         }
 
-        final List<Integer> keyList = new ArrayList<>(InputListener.KEY_LIST);
-        for (Integer integer : keyList) {
-            if (keyBindPressed(Action.CLIP, integer)) {
-                if (canClip) {
-                    final AbstractGameObject gameObject = getObjectStandingOn();
-                    if (gameObject != null && gameObject.isPassThrough()) {
-                        setPositionY(getPositionY() + 2 + getHeight() / 2 + getObjectStandingOn().getHeight() / 2);
-                    }
-                    canClip = false;
-                }
-            } else if (keyBindPressed(Action.ATTACK, integer)) {
-                if (canAttack) {
-                    attacking = true;
-                    final AbstractPlayerObject rayTraced = getRayTrace(attackFacing == Direction.DOWN || attackFacing == Direction.UP ? 60 : 40, attackFacing);
-                    if (rayTraced != null) {
-                        attack(rayTraced);
-                        if (rayTraced.isBlocking() && rayTraced.canBlock()) {
-                            final PlayerBlockEvent playerBlockEvent = new PlayerBlockEvent(this, rayTraced);
-                            Game.instance.onEvent(playerBlockEvent);
-                            rayTraced.setBlockCounter(rayTraced.getBlockCounter() + 1);
-                        } else {
-                            Game.instance.onEvent(playerAttackEvent);
-                        }
-                    }
-                    canAttack = false;
-                }
-            } else if (keyBindPressed(Action.BLOCK, integer)) {
-                setBlocking(true);
-                setHorizontalMotion(getHorizontalMotion() / 2);
-            } else if (keyBindPressed(Action.FORWARDS, integer)) {
-                setAttackFacing(Direction.RIGHT);
-                move(Direction.RIGHT);
-            } else if (keyBindPressed(Action.BACKWARDS, integer)) {
-                setAttackFacing(Direction.LEFT);
-                move(Direction.LEFT);
-            } else if (keyBindPressed(Action.UP, integer)) {
-                setAttackFacing(Direction.UP);
-            } else if (keyBindPressed(Action.DOWN, integer)) {
-                setAttackFacing(Direction.DOWN);
-            } else if (keyBindPressed(Action.JUMP, integer)) {
-                if (canJump && ++jumpCounter <= MAX_AIR_JUMPS) {
-                    verticalMotion = 30;
-                    canJump = false;
-                    horizontalMotion += 2 * facing.getHorizontalFactor();
-                    Game.instance.onEvent(playerJumpEvent);
-                }
-            }
+        if (controller != null) {
+            Game.instance.getControllerListener().handleController(controller, componentList);
         }
-        for (Controller controller : InputListener.CONTROLLER_LIST) {
-            controller.poll();
-            if (controller.getType() == Controller.Type.GAMEPAD) {
-                for (Component component : controller.getComponents()) {
-                    if (component.getIdentifier().getName().equals("0"))
-                        System.out.println(component.getPollData());
-                    if (!controllerButtonPressed(Action.ATTACK, new Tuple<>(component.getIdentifier().getName(), component.getPollData()))) {
-                        canAttack = true;
-                    }
 
-                    if (!controllerButtonPressed(Action.CLIP, new Tuple<>(component.getIdentifier().getName(), component.getPollData()))) {
-                        canClip = true;
-                    }
+        handleInputs();
 
-                    if (!controllerButtonPressed(Action.JUMP, new Tuple<>(component.getIdentifier().getName(), component.getPollData()))) {
-                        canJump = true;
-                    }
-                    if (controllerButtonPressed(Action.CLIP, new Tuple<>(component.getIdentifier().getName(), component.getPollData()))) {
-                        if (canClip) {
-                            final AbstractGameObject gameObject = getObjectStandingOn();
-                            if (gameObject != null && gameObject.isPassThrough()) {
-                                setPositionY(getPositionY() + 2 + getHeight() / 2 + getObjectStandingOn().getHeight() / 2);
-                            }
-                            canClip = false;
-                        }
-                    } else if (controllerButtonPressed(Action.ATTACK, new Tuple<>(component.getIdentifier().getName(), component.getPollData()))) {
-                        if (canAttack) {
-                            final AbstractPlayerObject rayTraced = getRayTrace(attackFacing == Direction.DOWN || attackFacing == Direction.UP ? 60 : 40, attackFacing);
-                            if (rayTraced != null) {
-                                attack(rayTraced);
-                                if (rayTraced.isBlocking() && rayTraced.canBlock()) {
-                                    final PlayerBlockEvent playerBlockEvent = new PlayerBlockEvent(this, rayTraced);
-                                    Game.instance.onEvent(playerBlockEvent);
-                                    rayTraced.setBlockCounter(rayTraced.getBlockCounter() + 1);
-                                } else {
-                                    Game.instance.onEvent(playerAttackEvent);
-                                }
-                            }
-                            canAttack = false;
-                        }
-                    } else if (controllerButtonPressed(Action.BLOCK, new Tuple<>(component.getIdentifier().getName(), component.getPollData()))) {
-                        setBlocking(true);
-                        setHorizontalMotion(getHorizontalMotion() / 2);
-                    } else if (controllerButtonPressed(Action.FORWARDS, new Tuple<>(component.getIdentifier().getName(), component.getPollData()))) {
-                        setAttackFacing(Direction.RIGHT);
-                        move(Direction.RIGHT);
-                    } else if (controllerButtonPressed(Action.BACKWARDS, new Tuple<>(component.getIdentifier().getName(), component.getPollData()))) {
-                        setAttackFacing(Direction.LEFT);
-                        move(Direction.LEFT);
-                    } else if (controllerButtonPressed(Action.UP, new Tuple<>(component.getIdentifier().getName(), component.getPollData()))) {
-                        setAttackFacing(Direction.UP);
-                    } else if (controllerButtonPressed(Action.DOWN, new Tuple<>(component.getIdentifier().getName(), component.getPollData()))) {
-                        setAttackFacing(Direction.DOWN);
-                    } else if (controllerButtonPressed(Action.JUMP, new Tuple<>(component.getIdentifier().getName(), component.getPollData()))) {
-                        if (canJump && ++jumpCounter <= MAX_AIR_JUMPS) {
-                            verticalMotion = 30;
-                            canJump = false;
-                            horizontalMotion += 2 * facing.getHorizontalFactor();
-                            Game.instance.onEvent(playerJumpEvent);
-                        }
-                    }
-                }
-
-            }
-        }
         if (!canBlock() || !isBlocking()) {
             if (timeHelper.hasPassed(BLOCK_DELAY)) {
                 blockCounter = 0;
@@ -273,14 +186,31 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         } else {
             timeHelper.reset();
         }
+
+        if (!effectList.isEmpty()) {
+            effectList.removeIf(AbstractEffect::isToBeRemoved);
+            effectList.stream().filter(abstractEffect -> !abstractEffect.isToBeRemoved()).forEach(abstractEffect -> {
+                if (abstractEffect.getTimeHelper().hasPassed(abstractEffect.getDuration())) {
+                    System.out.println(abstractEffect.getTimeHelper().getDifference());
+                    abstractEffect.removeEffect();
+                } else {
+                    abstractEffect.onEffect();
+                }
+            });
+        }
+
         if (healthPoints <= 0 && lives > 0) {
             respawnPlayer();
         }
         if (lives <= 0) {
-            final GameFinishedEvent gameFinishedEvent = new GameFinishedEvent(lastDamageSource == null ? Game.instance.getObjectHandler().getGameObjects().stream().filter(gameObject -> gameObject instanceof AbstractPlayerObject && gameObject != this).findFirst().orElse(null) : lastDamageSource);
-            Game.instance.onEvent(gameFinishedEvent);
-        }
+            deleteObject();
+            if (Game.instance.getObjectHandler().getGameObjects().stream().filter(abstractGameObject -> abstractGameObject instanceof AbstractPlayerObject && ((AbstractPlayerObject) abstractGameObject).getLives() > 0).toList().size() -1 < 1) {
+                final GameFinishedEvent gameFinishedEvent = new GameFinishedEvent(lastDamageSource == null ? Game.instance.getObjectHandler().getGameObjects().stream().filter(gameObject -> gameObject instanceof AbstractPlayerObject && gameObject != this).findFirst().orElse(null) : lastDamageSource);
+                Game.instance.onEvent(gameFinishedEvent);
+            }
     }
+
+}
 
     private void respawnPlayer() {
         lives--;
@@ -370,49 +300,52 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     }
 
     public void move(Direction direction) {
-        //movement.move(this, direction);
         if (direction.getHorizontalFactor() != 0) {
             this.facing = direction;
         }
-     /*   if (direction == Direction.LEFT && facing.getHorizontalFactor() != -1) {
-            return;
-        }else if(direction == Direction.RIGHT && facing.getHorizontalFactor() != 1) {
-            return;
-        }*/
-        horizontalMotion += 2 * facing.getHorizontalFactor();
-        horizontalMotion *= 1.2;
-        horizontalMotion = Math.min(5, horizontalMotion);
-        horizontalMotion = Math.max(-5, horizontalMotion);
-    }
-
-    private void correctFactor() {
-        switch (getFacing()) {
-            case LEFT -> getFacing().setHorizontalFactor(Direction.LEFT.getHorizontalFactor());
-            case RIGHT -> getFacing().setHorizontalFactor(Direction.RIGHT.getHorizontalFactor());
+        if (Math.abs(horizontalMotion) < MAX_SPEED) {
+            horizontalMotion += 2 * facing.getHorizontalFactor();
+            horizontalMotion *= 1.2;
+            //falls horizontalMotion den max. Movement-Speed überschreiten sollte wird hier die Motion nochmal auf die maximale Geschwindigkeit angepasst
+            if (Math.abs(horizontalMotion) >= MAX_SPEED) {
+                horizontalMotion = Math.min(MAX_SPEED, horizontalMotion);
+                horizontalMotion = Math.max(-MAX_SPEED, horizontalMotion);
+            }
         }
     }
 
     private void addKeyBinds() {
+        //add Controller binds
+        keyBindMap.put(Action.FORWARDS, new KeyBind(new Tuple<>("x", "+")));
+        keyBindMap.put(Action.BACKWARDS, new KeyBind(new Tuple<>("x", "-")));
+        keyBindMap.put(Action.JUMP, new KeyBind(new Tuple<>("0", "+")));
+        keyBindMap.put(Action.CLIP, new KeyBind(new Tuple<>("ry", "+")));
+        keyBindMap.put(Action.ATTACK, new KeyBind(new Tuple<>("1", "+")));
+        keyBindMap.put(Action.BLOCK, new KeyBind(new Tuple<>("z", "+-")));
+        keyBindMap.put(Action.DOWN, new KeyBind(new Tuple<>("y", "-")));
+        keyBindMap.put(Action.UP, new KeyBind(new Tuple<>("y", "+")));
+
+        //add Keyboard binds to existing Map Entry
         switch (this.getId()) {
             case 0 -> {
-                keyBindMap.put(Action.FORWARDS, new KeyBind(new Tuple<>("x", 1f), KeyEvent.VK_D));
-                keyBindMap.put(Action.BACKWARDS, new KeyBind(new Tuple<>("x", -1f), KeyEvent.VK_A));
-                keyBindMap.put(Action.JUMP, new KeyBind(new Tuple<>("0", 1f), KeyEvent.VK_SPACE));
-                keyBindMap.put(Action.CLIP, new KeyBind(new Tuple<>("ry", 1f), KeyEvent.VK_Y));
-                keyBindMap.put(Action.ATTACK, new KeyBind(new Tuple<>("1", 1f), KeyEvent.VK_X));
-                keyBindMap.put(Action.BLOCK, new KeyBind(new Tuple<>("z", 1f), KeyEvent.VK_C));
-                keyBindMap.put(Action.DOWN, new KeyBind(new Tuple<>("y", -1f), KeyEvent.VK_S));
-                keyBindMap.put(Action.UP, new KeyBind(new Tuple<>("y", 1f), KeyEvent.VK_W));
+                keyBindMap.get(Action.FORWARDS).setKeyCode(KeyEvent.VK_D);
+                keyBindMap.get(Action.BACKWARDS).setKeyCode(KeyEvent.VK_A);
+                keyBindMap.get(Action.JUMP).setKeyCode(KeyEvent.VK_SPACE);
+                keyBindMap.get(Action.CLIP).setKeyCode(KeyEvent.VK_Y);
+                keyBindMap.get(Action.ATTACK).setKeyCode(KeyEvent.VK_X);
+                keyBindMap.get(Action.BLOCK).setKeyCode(KeyEvent.VK_C);
+                keyBindMap.get(Action.DOWN).setKeyCode(KeyEvent.VK_S);
+                keyBindMap.get(Action.UP).setKeyCode(KeyEvent.VK_W);
             }
             case 1 -> {
-                keyBindMap.put(Action.FORWARDS, new KeyBind(new Tuple<>("x", 1f), KeyEvent.VK_RIGHT));
-                keyBindMap.put(Action.BACKWARDS, new KeyBind(new Tuple<>("x", -1f), KeyEvent.VK_LEFT));
-                keyBindMap.put(Action.JUMP, new KeyBind(new Tuple<>("0", 1f), KeyEvent.VK_SHIFT));
-                keyBindMap.put(Action.CLIP, new KeyBind(new Tuple<>("ry", 1f), KeyEvent.VK_DOWN));
-                keyBindMap.put(Action.ATTACK, new KeyBind(new Tuple<>("1", 1f), KeyEvent.VK_CONTROL));
-                keyBindMap.put(Action.BLOCK, new KeyBind(new Tuple<>("z", 1f), KeyEvent.VK_NUMPAD0));
-                keyBindMap.put(Action.DOWN, new KeyBind(new Tuple<>("y", -1f), KeyEvent.VK_DOWN));
-                keyBindMap.put(Action.UP, new KeyBind(new Tuple<>("y", 1f), KeyEvent.VK_UP));
+                keyBindMap.get(Action.FORWARDS).setKeyCode(KeyEvent.VK_RIGHT);
+                keyBindMap.get(Action.BACKWARDS).setKeyCode(KeyEvent.VK_LEFT);
+                keyBindMap.get(Action.JUMP).setKeyCode(KeyEvent.VK_SHIFT);
+                keyBindMap.get(Action.CLIP).setKeyCode(KeyEvent.VK_DOWN);
+                keyBindMap.get(Action.ATTACK).setKeyCode(KeyEvent.VK_CONTROL);
+                keyBindMap.get(Action.BLOCK).setKeyCode(KeyEvent.VK_NUMPAD0);
+                keyBindMap.get(Action.DOWN).setKeyCode(KeyEvent.VK_DOWN);
+                keyBindMap.get(Action.UP).setKeyCode(KeyEvent.VK_UP);
             }
         }
     }
@@ -421,14 +354,121 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         return Objects.equals(key, keyBindMap.get(action).getKeyCode());
     }
 
-    private boolean controllerButtonPressed(Action action, Tuple<String, Float> controller) {
-        return (controller.x.equals(keyBindMap.get(action).getControllerTuple().x) && Math.signum(Math.round(controller.y * 100)) == Math.signum(Math.round(keyBindMap.get(action).getControllerTuple().y * 100)) && Math.abs(Math.round(controller.y * 100)) > 20);
+    private boolean checkControllerInputValue(String input, float value) {
+        final float valueToCheck = Math.signum(Math.round(value * 100));
+        switch (input) {
+            case "+" -> {
+                if (valueToCheck == 1) {
+                    return true;
+                }
+            }
+            case "-" -> {
+                if (valueToCheck == -1) {
+                    return true;
+                }
+            }
+            case "+-", "-+" -> {
+                if (value != 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
-    private boolean canExecuteAction(Action action, int keyCode, Tuple<String, Float> controller) {
-        return Objects.equals(keyCode, keyBindMap.get(action).getKeyCode()) || (controller.x.equals(keyBindMap.get(action).getControllerTuple().x) && Math.signum(Math.round(controller.y * 100)) == Math.signum(Math.round(keyBindMap.get(action).getControllerTuple().y * 100)) && Math.abs(Math.round(controller.y * 100)) > 20);
+    private boolean controllerButtonPressed(Action action, Component component) {
+        return (component.getIdentifier().getName().equals(keyBindMap.get(action).getControllerTuple().x) && checkControllerInputValue(keyBindMap.get(action).getControllerTuple().y, component.getPollData()));
     }
 
+    private void executeAction(Action action) {
+        switch (action) {
+            case CLIP -> {
+                if (canClip) {
+                    final AbstractGameObject gameObject = getObjectStandingOn();
+                    if (gameObject != null && gameObject.isPassThrough()) {
+                        setPositionY(getPositionY() + 2 + getHeight() / 2 + getObjectStandingOn().getHeight() / 2);
+                    }
+                    canClip = false;
+                }
+            }
+            case ATTACK -> {
+                if (canAttack) {
+                    attacking = true;
+                    final AbstractPlayerObject rayTraced = getRayTrace(attackFacing == Direction.DOWN || attackFacing == Direction.UP ? 60 : 40, attackFacing);
+                    if (rayTraced != null) {
+                        onAttack(rayTraced);
+                        if (rayTraced.isBlocking() && rayTraced.canBlock()) {
+                            final PlayerBlockEvent playerBlockEvent = new PlayerBlockEvent(this, rayTraced);
+                            Game.instance.onEvent(playerBlockEvent);
+                            rayTraced.setBlockCounter(rayTraced.getBlockCounter() + 1);
+                        } else {
+                            Game.instance.onEvent(playerAttackEvent);
+                        }
+                    }
+                    canAttack = false;
+                }
+            }
+            case BLOCK -> {
+                setBlocking(true);
+                setHorizontalMotion(getHorizontalMotion() / 2);
+            }
+            case FORWARDS -> {
+                setAttackFacing(Direction.RIGHT);
+                move(Direction.RIGHT);
+            }
+            case BACKWARDS -> {
+                setAttackFacing(Direction.LEFT);
+                move(Direction.LEFT);
+            }
+            case UP -> {
+                setAttackFacing(Direction.UP);
+            }
+            case DOWN -> {
+                setAttackFacing(Direction.DOWN);
+            }
+            case JUMP -> {
+                if (canJump && ++jumpCounter <= MAX_AIR_JUMPS) {
+                    verticalMotion = 30;
+                    canJump = false;
+                    horizontalMotion += 2 * facing.getHorizontalFactor();
+                    Game.instance.onEvent(playerJumpEvent);
+                }
+            }
+        }
+    }
+
+    private void handleInputs() {
+        if (keyBindMap.isEmpty()) {
+            return;
+        }
+        if ((!KeyboardListener.KEY_LIST.contains(keyBindMap.get(Action.ATTACK).getKeyCode()) && componentList.stream().filter(component -> component.getIdentifier().getName().equals(keyBindMap.get(Action.ATTACK).getControllerTuple().x)).toList().isEmpty())) {
+            canAttack = true;
+        }
+
+        if ((!KeyboardListener.KEY_LIST.contains(keyBindMap.get(Action.CLIP).getKeyCode()) && componentList.stream().filter(component -> component.getIdentifier().getName().equals(keyBindMap.get(Action.CLIP).getControllerTuple().x)).toList().isEmpty())) {
+            canClip = true;
+        }
+
+        if ((!KeyboardListener.KEY_LIST.contains(keyBindMap.get(Action.JUMP).getKeyCode()) && componentList.stream().filter(component -> component.getIdentifier().getName().equals(keyBindMap.get(Action.JUMP).getControllerTuple().x)).toList().isEmpty())) {
+            canJump = true;
+        }
+
+        final List<Integer> keyList = new ArrayList<>(KeyboardListener.KEY_LIST);
+        if (!keyList.isEmpty() || !componentList.isEmpty()) {
+            for (Action action : Action.values()) {
+                for (Integer keyCode : keyList) {
+                    if (keyBindPressed(action, keyCode)) {
+                        executeAction(action);
+                    }
+                }
+                for (Component component : componentList) {
+                    if (controllerButtonPressed(action, component)) {
+                        executeAction(action);
+                    }
+                }
+            }
+        }
+    }
 
     public void jump(int height) {
         movement.jump(this, height);
@@ -479,12 +519,6 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         this.lives = lives;
     }
 
-    //https://www.ssbwiki.com/Knockback#Formula
-    public int calculateKnockBack(int percentage, int damage, int weight, int knockBackScaling,
-                                  int baseKnockBack,
-                                  int ratio) {
-        return (int) (((((((percentage / 10) + (percentage * damage) / 20) * (200 / (weight + 100)) * 1.4) + 18) * knockBackScaling) + baseKnockBack) * ratio);
-    }
 
     public void setHorizontalMotion(int horizontalMotion) {
         this.horizontalMotion = horizontalMotion;
@@ -510,6 +544,10 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         return id;
     }
 
+    public Color getColor() {
+        return color;
+    }
+
     public boolean isBlocking() {
         return blocking;
     }
@@ -524,6 +562,35 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
 
     public void setBlocking(boolean blocking) {
         this.blocking = blocking;
+    }
+
+    public int getStrength() {
+        return strength;
+    }
+
+    public void setStrength(int strength) {
+        this.strength = strength;
+    }
+
+    public int getBaseStrength() {
+        return baseStrength;
+    }
+
+    public int getBaseHealthPoints() {
+        return baseHealthPoints;
+    }
+
+    public void addEffects(AbstractEffect effect) {
+        effectList.removeIf(effect1 -> effect.getName().equals(effect1.getName()));
+        effectList.add(effect);
+    }
+
+    public Controller getController() {
+        return controller;
+    }
+
+    public void setController(Controller controller) {
+        this.controller = controller;
     }
 }
 

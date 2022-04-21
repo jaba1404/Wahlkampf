@@ -7,7 +7,7 @@ public class TimeHelper {
         return System.currentTimeMillis();
     }
 
-    private long getDifference() {
+    public long getDifference() {
         return getCurrentMS() - lastMS;
     }
 

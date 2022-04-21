@@ -1,5 +1,6 @@
 package de.itg.wahlkampf.menu.optionui.element.elements;
 
+import de.itg.wahlkampf.Game;
 import de.itg.wahlkampf.menu.optionui.Panel;
 import de.itg.wahlkampf.menu.optionui.element.AbstractElement;
 import de.itg.wahlkampf.setting.AbstractSetting;
@@ -17,7 +18,7 @@ public class ElementSlider extends AbstractElement {
 
     public ElementSlider(Panel panel, SettingSlider settingSlider) {
         super(panel);
-        mathHelper = new MathHelper();
+        mathHelper = Game.instance.getMathHelper();
         this.settingSlider = settingSlider;
     }
 
@@ -25,12 +26,12 @@ public class ElementSlider extends AbstractElement {
     public void drawScreen(Graphics graphics, int mouseX, int mouseY) {
         if (dragging) {
             final double diff = settingSlider.getMaxValue() - settingSlider.getMinValue();
-            final double value = diff / (100) * (mouseX - getX()) + settingSlider.getMinValue();
+            final double value = diff / (getWidth()) * (mouseX - getX()) + settingSlider.getMinValue();
             settingSlider.setCurrentValue(mathHelper.getRounded((float) Math.min(Math.max(value, settingSlider.getMinValue()), settingSlider.getMaxValue()), (float) settingSlider.getAccuracy()));
         }
         final double diff = settingSlider.getMaxValue() - settingSlider.getMinValue();
-        final double value = (settingSlider.getCurrentValue() - settingSlider.getMinValue()) * (100) / diff;
-        getRenderer().drawFillRectangle(graphics, getX(), getY(), 100, getHeight(), new Color(255, 255, 255, 100));
+        final double value = (settingSlider.getCurrentValue() - settingSlider.getMinValue()) * (getWidth()) / diff;
+        getRenderer().drawFillRectangle(graphics, getX(), getY(), getWidth(), getHeight(), new Color(255, 255, 255, 100));
         getRenderer().drawFillRectangle(graphics, getX(), getY(), (int) value, getHeight(), new Color(220, 220, 220, 200));
         getRenderer().textWithShadow(graphics, settingSlider.getName() + ": " + settingSlider.getCurrentValue(), getX(), getY() + (getHeight() + (int) textFont.getStringSize(settingSlider.getName() + ": " + settingSlider.getCurrentValue()).getHeight() / 2) / 2, new Color(230, 230, 230, 255), textFont);
     }
@@ -40,7 +41,7 @@ public class ElementSlider extends AbstractElement {
         if (!settingSlider.canRender() || !settingSlider.isShowInOptions())
             return;
         if (mouseButton == 1) {
-            if (mouseX >= getX() && mouseX < getX() + 100 && mouseY >= getY() && mouseY < getY() + getHeight()) {
+            if (mouseX >= getX() && mouseX < getX() + getWidth() && mouseY >= getY() && mouseY < getY() + getHeight()) {
                 dragging = true;
             }
         }

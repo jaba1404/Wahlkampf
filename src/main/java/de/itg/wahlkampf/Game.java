@@ -5,20 +5,22 @@ import de.itg.wahlkampf.event.impl.*;
 import de.itg.wahlkampf.menu.menus.FinishedMenu;
 import de.itg.wahlkampf.menu.menus.InGameMenu;
 import de.itg.wahlkampf.menu.menus.MainMenu;
-import de.itg.wahlkampf.object.AbstractGameObject;
-import de.itg.wahlkampf.object.AbstractPlayerObject;
-import de.itg.wahlkampf.object.ObjectHandler;
-import de.itg.wahlkampf.object.Type;
+import de.itg.wahlkampf.object.*;
+import de.itg.wahlkampf.object.objects.items.RegenerationItem;
+import de.itg.wahlkampf.object.objects.items.StrengthItem;
 import de.itg.wahlkampf.setting.SettingManager;
 import de.itg.wahlkampf.setting.settings.SettingCheckBox;
 import de.itg.wahlkampf.setting.settings.SettingComboBox;
+import de.itg.wahlkampf.utilities.*;
 import de.itg.wahlkampf.utilities.Font;
-import de.itg.wahlkampf.utilities.InputListener;
 import de.itg.wahlkampf.utilities.Renderer;
+import de.itg.wahlkampf.utilities.inputhandling.ControllerListener;
+import de.itg.wahlkampf.utilities.inputhandling.KeyboardListener;
 import de.itg.wahlkampf.utilities.particlesystem.AbstractParticle;
 import de.itg.wahlkampf.utilities.particlesystem.ParticleHandler;
 import de.itg.wahlkampf.utilities.sound.Sound;
 import de.itg.wahlkampf.utilities.sound.SoundHelper;
+import net.java.games.input.Controller;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,29 +45,38 @@ public class Game extends Canvas implements Runnable {
     private final Window window;
     private final Renderer renderer;
     private final ParticleHandler particleHandler;
-    private final InputListener inputListener;
+    private final KeyboardListener keyboardListener;
+    private final ControllerListener controllerListener;
     private final SettingManager settingManager;
     private final SoundHelper soundHelper;
+    private final MathHelper mathHelper;
     private MainMenu menu;
     private InGameMenu ingameMenu;
     private final FinishedMenu finishedMenu;
-    private int playerAmount = 2;
-    private List<AbstractPlayerObject> playerObjectList;
+    private int playerAmount = 6;
     private boolean running;
     private Thread thread;
+    private final SettingCheckBox showFps;
     private final SettingCheckBox startGame;
     private final SettingComboBox stageSetting;
     private final Map<String, URL> backgroundMap;
+    private final List<Controller> controllerList;
     private URL backgroundFile;
-    private net.java.games.input.Event controllerEvent;
+    private final TimeHelper spawnTimeHelper;
+    private long spawnDelay;
 
     private float framesPerSecond = 60;
     private final Font textFont = new Font("Roboto", Font.PLAIN, 12);
 
     public Game() {
         instance = this;
-        inputListener = new InputListener(this);
+        keyboardListener = new KeyboardListener();
+        controllerListener = new ControllerListener();
         soundHelper = new SoundHelper();
+        spawnTimeHelper = new TimeHelper();
+        spawnTimeHelper.reset();
+        mathHelper = new MathHelper();
+        spawnDelay = mathHelper.getRandomInt(30000, 45000);
         backgroundMap = Stream.of(new Object[][]{
                 {"White House", getClass().getResource("assets/hintergrund 1.gif")},
                 {"Red Arena", getClass().getResource("assets/9BC613A2-35B0-488D-B6AC-E217003CA6C8.gif")},
@@ -73,12 +84,13 @@ public class Game extends Canvas implements Runnable {
         playerNames.addAll(Arrays.asList("Trump", "Merkel"));
         playerNames.add("None");
         settingManager = new SettingManager();
+        showFps = (SettingCheckBox) settingManager.getSettingByName("Show FPS");
         startGame = (SettingCheckBox) settingManager.getSettingByName("Start Game");
         stageSetting = (SettingComboBox) settingManager.getSettingByName("Stage");
         backgroundFile = backgroundMap.get(stageSetting.getCurrentOption());
 
         renderer = new Renderer();
-        this.addKeyListener(inputListener);
+        this.addKeyListener(keyboardListener);
         window = new Window(GAME_TITLE, GAME_DIMENSION.width, GAME_DIMENSION.height, this);
         objectHandler = new ObjectHandler();
         menu = new MainMenu();
@@ -87,8 +99,14 @@ public class Game extends Canvas implements Runnable {
         this.addMouseMotionListener(menu);
         this.addMouseListener(finishedMenu);
         this.addMouseMotionListener(finishedMenu);
-        playerObjectList = new ArrayList<>();
+        controllerList = new ArrayList<>();
         particleHandler = new ParticleHandler();
+
+        for (Controller controller : ControllerListener.CONTROLLER_LIST) {
+            if (controller.getType().equals(Controller.Type.GAMEPAD)) {
+                controllerList.add(controller);
+            }
+        }
     }
 
     public synchronized void start() {
@@ -110,7 +128,6 @@ public class Game extends Canvas implements Runnable {
     public void run() {
         running = true;
 
-        boolean render;
         double firstTime;
         double lastTime = System.nanoTime() / 1000000000.0;
         double passedTime;
@@ -121,7 +138,6 @@ public class Game extends Canvas implements Runnable {
         int fps;
 
         while (running) {
-            render = false;
             firstTime = System.nanoTime() / 1000000000.0;
             passedTime = firstTime - lastTime;
             lastTime = firstTime;
@@ -132,7 +148,6 @@ public class Game extends Canvas implements Runnable {
             while (unprocessedTime >= UPDATE_CAP) {
 
                 unprocessedTime -= UPDATE_CAP;
-                render = true;
 
                 if (frameTime >= 1.0) {
                     frameTime = 0;
@@ -140,32 +155,38 @@ public class Game extends Canvas implements Runnable {
                     framesPerSecond = fps;
                     frames = 0;
                 }
+
                 if (!isFocused()) {
-                    if (!InputListener.KEY_LIST.isEmpty()) {
-                        InputListener.KEY_LIST.clear();
+                    if (!KeyboardListener.KEY_LIST.isEmpty()) {
+                        KeyboardListener.KEY_LIST.clear();
                         System.out.println("Cleared!");
+
                     }
                 }
                 if (startGame.isActive()) {
                     onTick();
+
+                    if (spawnTimeHelper.hasPassed(spawnDelay)) {
+                        if (objectHandler.getGameObjects().stream().filter(abstractGameObject -> abstractGameObject instanceof AbstractItemObject).toArray().length < 4) {
+                            switch (mathHelper.getRandomInt(0, 1)) {
+                                case 0 -> objectHandler.addObject(new RegenerationItem(mathHelper.getRandomInt(20, GAME_DIMENSION.width - 20), 0));
+                                case 1 -> objectHandler.addObject(new StrengthItem(mathHelper.getRandomInt(20, GAME_DIMENSION.width - 20), 0));
+                            }
+                        }
+                        spawnDelay = mathHelper.getRandomInt(25000, 45000);
+                        spawnTimeHelper.reset();
+                    }
+
                     objectHandler.getGameObjects().removeIf(AbstractGameObject::isDeleted);
                 }
             }
-            if (objectHandler != null)
-                System.out.println(objectHandler.getGameObjects().size());
-            if (render) {
-                //Render game
-                onRender();
-                frames++;
-            } else {
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+            //Render game
+            onRender();
+            frames++;
         }
+
         stop();
+
     }
 
     private void onTick() {
@@ -191,6 +212,18 @@ public class Game extends Canvas implements Runnable {
         }
         if (abstractEvent instanceof AddGameObjectsEvent) {
             ingameMenu = new InGameMenu(((AddGameObjectsEvent) abstractEvent).getPlayerObjects());
+            if (!controllerList.isEmpty()) {
+                for (int i = 0; i < ((AddGameObjectsEvent) abstractEvent).getPlayerObjects().size(); i++) {
+                    final AbstractPlayerObject playerObject = (AbstractPlayerObject) ((AddGameObjectsEvent) abstractEvent).getPlayerObjects().get(i);
+                    if (playerObject != null) {
+                        if (controllerList.size() > i) {
+                            playerObject.setController(controllerList.get(i));
+                        } else {
+                            System.out.println("not enough controller");
+                        }
+                    }
+                }
+            }
         }
         if (abstractEvent instanceof PlayerAttackEvent) {
             soundHelper.playMusic(Sound.HIT.getLocation());
@@ -213,10 +246,9 @@ public class Game extends Canvas implements Runnable {
         final Graphics graphics = bufferStrategy.getDrawGraphics();
         final Image background = new ImageIcon(backgroundFile).getImage();
         renderer.img(graphics, background, 0, 0, GAME_DIMENSION.width, GAME_DIMENSION.height);
-
-        renderer.textWithShadow(graphics, GAME_TITLE, 1, 10, Color.white, textFont);
-        renderer.textWithShadow(graphics, "FPS: " + framesPerSecond, 1, 25, Color.white, textFont);
-
+        if (showFps.isActive()) {
+            renderer.textWithShadow(graphics, "FPS: " + framesPerSecond, 1, GAME_DIMENSION.height - 40, Color.white, textFont);
+        }
         if (menu != null) {
             menu.drawScreen(graphics);
         }
@@ -228,7 +260,8 @@ public class Game extends Canvas implements Runnable {
                 gameObject.onRender(graphics);
                 if (gameObject instanceof AbstractPlayerObject) {
                     ingameMenu.drawScreen(graphics);
-                    renderer.textWithShadow(graphics, gameObject.getName() + " hp: " + ((AbstractPlayerObject) gameObject).getHealthPoints(), gameObject.getPositionX(), gameObject.getPositionY(), Color.WHITE, textFont);
+                    renderer.drawFillRectangle(graphics, (int) (gameObject.getPositionX() - gameObject.getWidth() + textFont.getStringSize(gameObject.getName()).getWidth() / 2) - 4, (int) (gameObject.getPositionY() - 5 - (textFont.getStringSize(gameObject.getName()).getHeight() / 2)) - 4, (int) textFont.getStringSize(gameObject.getName()).getWidth() + 8, (int) (textFont.getStringSize(gameObject.getName()).getHeight() / 2) +8, new Color(0,0,0,75));
+                    renderer.textWithShadow(graphics, gameObject.getName(), (int) (gameObject.getPositionX() - gameObject.getWidth() + textFont.getStringSize(gameObject.getName()).getWidth() / 2), gameObject.getPositionY() - 5, ((AbstractPlayerObject) gameObject).getColor(), textFont);
                 }
             });
             menu = null;
@@ -248,6 +281,10 @@ public class Game extends Canvas implements Runnable {
         bufferStrategy.show();
     }
 
+    public MathHelper getMathHelper() {
+        return mathHelper;
+    }
+
     public ObjectHandler getObjectHandler() {
         return objectHandler;
     }
@@ -258,6 +295,10 @@ public class Game extends Canvas implements Runnable {
 
     public SettingManager getSettingManager() {
         return settingManager;
+    }
+
+    public ControllerListener getControllerListener() {
+        return controllerListener;
     }
 
     public boolean isFocused() {
