@@ -41,7 +41,7 @@ public class FinishedMenu extends MouseAdapter implements IMenu {
 
         quitButton.drawScreen(graphics, mouseX, mouseY);
         panel.drawScreen(graphics, mouseX, mouseY);
-        final String text = "Dear Mr./Mrs. " + abstractPlayerObject.getName() + ", you have just won the election";
+        final String text = "Dear Mr./Mrs. " + abstractPlayerObject.getName() + ", you have won the election";
         renderer.textWithShadow(graphics, text, (int) ((Game.instance.getSize().width - titleFont.getStringSize(text).getWidth()) / 2), Game.instance.getSize().height / 2 - 60, new Color(230, 230, 230, 255), titleFont);
         //renderer.textWithShadow(graphics, "You have won!", (int) ((Game.instance.getSize().width - versionFont.getStringSize("You have won!").getWidth()) / 2), Game.instance.getSize().height / 2 - 105, new Color(230, 230, 230, 255), versionFont);
     }

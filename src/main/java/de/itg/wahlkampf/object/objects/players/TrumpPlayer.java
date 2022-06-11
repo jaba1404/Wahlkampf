@@ -16,7 +16,7 @@ public class TrumpPlayer extends AbstractPlayerObject {
     private final SettingSlider knockbackModifierVertical;
 
     public TrumpPlayer(int id) {
-        super("Trump", Map.of("stand", new PlayerImage("assets/character/Trump.png"), "hit", new PlayerImage("assets/character/animation/trump_hit_edited.png")), id, 200, 5, 30, 120, 50, 21, 53);
+        super("Trump", Map.of("stand", new PlayerImage("assets/character/Trump.png"), "hit", new PlayerImage("assets/character/animation/trump_hit_edited.png")), id, 100, 8, 30, 120, 50, 21, 53);
         knockbackModifierHorizontal = (SettingSlider) Game.instance.getSettingManager().getSettingByName("Knockback Modifier X");
         knockbackModifierVertical = (SettingSlider) Game.instance.getSettingManager().getSettingByName("Knockback Modifier Y");
     }

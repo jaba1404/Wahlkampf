@@ -14,6 +14,6 @@ public class StrengthItem extends AbstractItemObject {
 
     @Override
     public void onPickUp() {
-        getPlayerObject().addEffects(new StrengthEffect(25,10000, getPlayerObject()));
+        getPlayerObject().addEffects(new StrengthEffect(50,10000, getPlayerObject()));
     }
 }
