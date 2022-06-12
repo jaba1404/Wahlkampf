@@ -9,7 +9,6 @@ public abstract class AbstractEffect {
     private final AbstractPlayerObject affectedPlayer;
     private final boolean deleteImmediately;
     private boolean toBeRemoved;
-
     private final TimeHelper timeHelper;
 
     public AbstractEffect(String name, long duration, AbstractPlayerObject affectedPlayer) {

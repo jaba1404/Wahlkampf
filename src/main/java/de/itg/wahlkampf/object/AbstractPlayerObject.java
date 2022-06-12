@@ -112,12 +112,6 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
         if (isBlocking() && canBlock()) {
             getRenderer().drawFillCircle(graphics, getPositionX() - 5, getPositionY() - 5, getWidth() + 10, getHeight() + 10, new Color(118, 231, 118, 150));
         }
-        if (facing.getHorizontalFactor() != 0) {
-            final AbstractGameObject below = getObjectStandingOn();
-            if (below != null) {
-                //
-            }
-        }
     }
 
     public void playerLogic() {
@@ -578,6 +572,10 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
 
     public int getBaseHealthPoints() {
         return baseHealthPoints;
+    }
+
+    public List<AbstractEffect> getEffectList() {
+        return effectList;
     }
 
     public void addEffects(AbstractEffect effect) {
