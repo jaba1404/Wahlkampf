@@ -4,7 +4,6 @@ import de.itg.wahlkampf.Game;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 public class PlayerImage {
@@ -18,8 +17,8 @@ public class PlayerImage {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        int width = bufferedImage.getWidth();
-        int height = bufferedImage.getHeight();
+        final int width = bufferedImage.getWidth();
+        final int height = bufferedImage.getHeight();
         flippedHorizontal = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
         flippedVertical = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
         for (int y = 0; y < height; y++) {

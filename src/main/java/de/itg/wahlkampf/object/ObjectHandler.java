@@ -3,13 +3,10 @@ package de.itg.wahlkampf.object;
 import de.itg.wahlkampf.Game;
 import de.itg.wahlkampf.event.impl.AddGameObjectsEvent;
 import de.itg.wahlkampf.object.objects.blocks.StageBlock;
-import de.itg.wahlkampf.object.objects.items.RegenerationItem;
-import de.itg.wahlkampf.object.objects.items.StrengthItem;
 import de.itg.wahlkampf.object.objects.players.MerkelPlayer;
 import de.itg.wahlkampf.object.objects.players.TrumpPlayer;
 import de.itg.wahlkampf.setting.settings.SettingComboBox;
 import de.itg.wahlkampf.utilities.MathHelper;
-import de.itg.wahlkampf.utilities.Tuple;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -22,8 +19,8 @@ public class ObjectHandler {
 
     private final ArrayList<AbstractGameObject> gameObjects = new ArrayList<>();
     private final MathHelper mathHelper;
-    private int x = 200, x2 = x;
-    private int y = 500;
+    private int x, x2;
+    private final int y = 500;
     private BufferedImage[] dirtBlocks;
     private BufferedImage[] metalBlocks;
     private final SettingComboBox stageSetting = (SettingComboBox) Game.instance.getSettingManager().getSettingByName("Stage");
@@ -31,14 +28,14 @@ public class ObjectHandler {
     public ObjectHandler() {
         try {
             dirtBlocks = new BufferedImage[]{
-                    ImageIO.read(Game.class.getResource("/de/itg/wahlkampf/assets/grass_block_left.png")),
-                    ImageIO.read(Game.class.getResource("/de/itg/wahlkampf/assets/grass_block.png")),
-                    ImageIO.read(Game.class.getResource("/de/itg/wahlkampf/assets/grass_block_right.png"))
+                    ImageIO.read(Game.class.getResource("/de/itg/wahlkampf/assets/blocks/grass/grass_block_left.png")),
+                    ImageIO.read(Game.class.getResource("/de/itg/wahlkampf/assets/blocks/grass/grass_block.png")),
+                    ImageIO.read(Game.class.getResource("/de/itg/wahlkampf/assets/blocks/grass/grass_block_right.png"))
             };
             metalBlocks = new BufferedImage[]{
-                    ImageIO.read(Game.class.getResource("/de/itg/wahlkampf/assets/metal_left_end.png")),
-                    ImageIO.read(Game.class.getResource("/de/itg/wahlkampf/assets/metal_main.png")),
-                    ImageIO.read(Game.class.getResource("/de/itg/wahlkampf/assets/metal_right_end.png"))
+                    ImageIO.read(Game.class.getResource("/de/itg/wahlkampf/assets/blocks/metal/metal_left_end.png")),
+                    ImageIO.read(Game.class.getResource("/de/itg/wahlkampf/assets/blocks/metal/metal_main.png")),
+                    ImageIO.read(Game.class.getResource("/de/itg/wahlkampf/assets/blocks/metal/metal_right_end.png"))
             };
         } catch (IOException e) {
             e.printStackTrace();
@@ -49,6 +46,8 @@ public class ObjectHandler {
 
     public void addGameObjects(String[] players) {
         final String option = stageSetting.getCurrentOption();
+        x = mathHelper.getRandomInt(100, 300);
+        x2 = mathHelper.getRandomInt(100, 300);
         for (int i = 0; i < 2; i++) {
             int width = Math.round(mathHelper.getRandomInt(100, 600) / 30f) * 30;
             int width2 = Math.round(mathHelper.getRandomInt(100, 600) / 30f) * 30;

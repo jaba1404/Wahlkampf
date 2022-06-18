@@ -185,7 +185,6 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
             effectList.removeIf(AbstractEffect::isToBeRemoved);
             effectList.stream().filter(abstractEffect -> !abstractEffect.isToBeRemoved()).forEach(abstractEffect -> {
                 if (abstractEffect.getTimeHelper().hasPassed(abstractEffect.getDuration())) {
-                    System.out.println(abstractEffect.getTimeHelper().getDifference());
                     abstractEffect.removeEffect();
                 } else {
                     abstractEffect.onEffect();

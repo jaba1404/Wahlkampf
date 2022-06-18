@@ -60,7 +60,7 @@ public class MainMenu extends MouseAdapter implements IMenu {
         mouseY = e.getY();
         panel.mouseClicked(mouseX, mouseY, e.getButton());
         if (startButton.canClick(mouseX, mouseY)) {
-            for (int i = 0; i < Game.instance.getPlayerAmount(); i++) {
+            for (int i = 0; i < Game.MAX_PLAYER_AMOUNT; i++) {
                 final String option = ((SettingComboBox) Game.instance.getSettingManager().getSettingByName("Player " + i)).getCurrentOption();
                 if (!option.equals("None")) {
                     players.add(option);

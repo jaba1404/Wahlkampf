@@ -5,19 +5,21 @@ import de.itg.wahlkampf.event.impl.*;
 import de.itg.wahlkampf.menu.menus.FinishedMenu;
 import de.itg.wahlkampf.menu.menus.InGameMenu;
 import de.itg.wahlkampf.menu.menus.MainMenu;
-import de.itg.wahlkampf.object.*;
+import de.itg.wahlkampf.object.AbstractGameObject;
+import de.itg.wahlkampf.object.AbstractItemObject;
+import de.itg.wahlkampf.object.AbstractPlayerObject;
+import de.itg.wahlkampf.object.ObjectHandler;
 import de.itg.wahlkampf.object.objects.items.RegenerationItem;
 import de.itg.wahlkampf.object.objects.items.StrengthItem;
 import de.itg.wahlkampf.setting.SettingManager;
 import de.itg.wahlkampf.setting.settings.SettingCheckBox;
 import de.itg.wahlkampf.setting.settings.SettingComboBox;
-import de.itg.wahlkampf.utilities.*;
 import de.itg.wahlkampf.utilities.Font;
+import de.itg.wahlkampf.utilities.MathHelper;
 import de.itg.wahlkampf.utilities.Renderer;
+import de.itg.wahlkampf.utilities.TimeHelper;
 import de.itg.wahlkampf.utilities.inputhandling.ControllerListener;
 import de.itg.wahlkampf.utilities.inputhandling.KeyboardListener;
-import de.itg.wahlkampf.utilities.particlesystem.AbstractParticle;
-import de.itg.wahlkampf.utilities.particlesystem.ParticleHandler;
 import de.itg.wahlkampf.utilities.sound.Sound;
 import de.itg.wahlkampf.utilities.sound.SoundHelper;
 import net.java.games.input.Controller;
@@ -37,6 +39,9 @@ public class Game extends Canvas implements Runnable {
     public static final String GAME_TITLE = "Wahlkampf";
     public static final String GAME_VERSION = "Alpha 1.0.0";
     public static final Dimension GAME_DIMENSION = new Dimension(1280, 720);
+
+    public static final int MAX_PLAYER_AMOUNT = 6;
+
     private static final double UPDATE_CAP = 1.0 / 60.0;
     public static Game instance;
 
@@ -44,7 +49,6 @@ public class Game extends Canvas implements Runnable {
     private final ObjectHandler objectHandler;
     private final Window window;
     private final Renderer renderer;
-    private final ParticleHandler particleHandler;
     private final KeyboardListener keyboardListener;
     private final ControllerListener controllerListener;
     private final SettingManager settingManager;
@@ -53,7 +57,6 @@ public class Game extends Canvas implements Runnable {
     private MainMenu menu;
     private InGameMenu ingameMenu;
     private final FinishedMenu finishedMenu;
-    private int playerAmount = 6;
     private boolean running;
     private Thread thread;
     private final SettingCheckBox showFps;
@@ -68,6 +71,8 @@ public class Game extends Canvas implements Runnable {
     private float framesPerSecond = 60;
     private final Font textFont = new Font("Roboto", Font.PLAIN, 12);
 
+    private Image background;
+
     public Game() {
         instance = this;
         keyboardListener = new KeyboardListener();
@@ -78,8 +83,8 @@ public class Game extends Canvas implements Runnable {
         mathHelper = new MathHelper();
         spawnDelay = mathHelper.getRandomInt(30000, 45000);
         backgroundMap = Stream.of(new Object[][]{
-                {"White House", getClass().getResource("assets/hintergrund 1.gif")},
-                {"Red Arena", getClass().getResource("assets/9BC613A2-35B0-488D-B6AC-E217003CA6C8.gif")},
+                {"White House", getClass().getResource("assets/background/white_house.gif")},
+                {"Red Arena", getClass().getResource("assets/background/red_arena.gif")},
         }).collect(Collectors.toMap(data -> (String) data[0], data -> (URL) data[1]));
         playerNames.addAll(Arrays.asList("Trump", "Merkel"));
         playerNames.add("None");
@@ -100,7 +105,7 @@ public class Game extends Canvas implements Runnable {
         this.addMouseListener(finishedMenu);
         this.addMouseMotionListener(finishedMenu);
         controllerList = new ArrayList<>();
-        particleHandler = new ParticleHandler();
+        background = new ImageIcon(backgroundFile).getImage();
 
         for (Controller controller : ControllerListener.CONTROLLER_LIST) {
             if (controller.getType().equals(Controller.Type.GAMEPAD)) {
@@ -165,7 +170,6 @@ public class Game extends Canvas implements Runnable {
                 }
                 if (startGame.isActive()) {
                     onTick();
-
                     if (spawnTimeHelper.hasPassed(spawnDelay)) {
                         if (objectHandler.getGameObjects().stream().filter(abstractGameObject -> abstractGameObject instanceof AbstractItemObject).toArray().length < 4) {
                             switch (mathHelper.getRandomInt(0, 1)) {
@@ -199,6 +203,7 @@ public class Game extends Canvas implements Runnable {
         if (abstractEvent instanceof SettingChangeEvent) {
             if (((SettingChangeEvent) abstractEvent).getTarget() == stageSetting) {
                 backgroundFile = backgroundMap.get(((SettingChangeEvent) abstractEvent).getDstString());
+                background = new ImageIcon(backgroundFile).getImage();
             }
             soundHelper.playMusic(Sound.SETTINGS_CHANGE.getLocation());
         }
@@ -244,7 +249,6 @@ public class Game extends Canvas implements Runnable {
         }
 
         final Graphics graphics = bufferStrategy.getDrawGraphics();
-        final Image background = new ImageIcon(backgroundFile).getImage();
         renderer.img(graphics, background, 0, 0, GAME_DIMENSION.width, GAME_DIMENSION.height);
         if (showFps.isActive()) {
             renderer.textWithShadow(graphics, "FPS: " + framesPerSecond, 1, GAME_DIMENSION.height - 40, Color.white, textFont);
@@ -265,12 +269,6 @@ public class Game extends Canvas implements Runnable {
                 }
             });
             menu = null;
-        }
-
-        if (particleHandler != null) {
-            for (AbstractParticle particle : particleHandler.getParticleList()) {
-                particle.drawParticle(graphics);
-            }
         }
 
         if (finishedMenu != null && finishedMenu.isVisible()) {
@@ -307,14 +305,6 @@ public class Game extends Canvas implements Runnable {
 
     public List<String> getPlayerNames() {
         return playerNames;
-    }
-
-    public int getPlayerAmount() {
-        return playerAmount;
-    }
-
-    public ParticleHandler getParticleHandler() {
-        return particleHandler;
     }
 
     public Map<String, URL> getBackgroundMap() {

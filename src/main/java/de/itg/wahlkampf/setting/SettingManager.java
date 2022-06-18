@@ -14,7 +14,7 @@ public class SettingManager {
     public SettingManager() {
         settingList.add(new SettingCheckBox("Start Game", false, false));
         settingList.add(new SettingComboBox("Stage", Game.instance.getBackgroundMap().keySet().toArray(new String[0]), Game.instance.getBackgroundMap().keySet().toArray(new String[0])[0], true));
-        for (int i = 0; i < Game.instance.getPlayerAmount(); i++) {
+        for (int i = 0; i < Game.MAX_PLAYER_AMOUNT; i++) {
             settingList.add(new SettingComboBox("Player " + i, Game.instance.getPlayerNames().toArray(new String[0]), Game.instance.getPlayerNames().get(0), true));
         }
         settingList.add(new SettingSlider("Knockback Modifier X", 0,50,19,1));
