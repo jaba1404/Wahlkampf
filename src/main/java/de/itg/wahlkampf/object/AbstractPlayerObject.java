@@ -43,6 +43,8 @@ public abstract class AbstractPlayerObject extends AbstractGameObject {
     private boolean canClip;
     private boolean attacking;
     private boolean blocking;
+
+    //for the future to calculate the velocity of the player by his weight
     private int weight;
     private final Map<String, PlayerImage> imageMap;
     private int healthPoints;

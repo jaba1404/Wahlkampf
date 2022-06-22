@@ -10,7 +10,6 @@ import de.itg.wahlkampf.utilities.Renderer;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 public class FinishedMenu extends MouseAdapter implements IMenu {
     private final de.itg.wahlkampf.menu.Button quitButton;
@@ -22,7 +21,6 @@ public class FinishedMenu extends MouseAdapter implements IMenu {
     private final Font titleFont;
     private AbstractPlayerObject abstractPlayerObject;
     private final Renderer renderer;
-    final ArrayList<String> players = new ArrayList<>();
 
     public FinishedMenu() {
         final int x = (Game.instance.getSize().width - width) / 2;

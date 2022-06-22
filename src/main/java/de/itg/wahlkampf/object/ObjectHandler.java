@@ -49,19 +49,22 @@ public class ObjectHandler {
         x = mathHelper.getRandomInt(100, 300);
         x2 = mathHelper.getRandomInt(100, 300);
         for (int i = 0; i < 2; i++) {
-            int width = Math.round(mathHelper.getRandomInt(100, 600) / 30f) * 30;
-            int width2 = Math.round(mathHelper.getRandomInt(100, 600) / 30f) * 30;
-            addObject(new StageBlock(x, y, width, 30, option.equals("White House") ? dirtBlocks : metalBlocks, true));
-            addObject(new StageBlock(x2, y - 150, width2, 30, option.equals("White House") ? dirtBlocks : metalBlocks, true));
+            final int width = Math.round(mathHelper.getRandomInt(100, 600) / 30f) * 30;
+            final int width2 = Math.round(mathHelper.getRandomInt(100, 600) / 30f) * 30;
+            final BufferedImage[] blocks = option.equals("White House") ? dirtBlocks : metalBlocks;
+            addObject(new StageBlock(x, y, x + width > Game.GAME_DIMENSION.width ? Game.GAME_DIMENSION.width - x - 50 : width, 30, blocks, true));
+            addObject(new StageBlock(x2, y - 150, x2 + width2 > Game.GAME_DIMENSION.width ? Game.GAME_DIMENSION.width - x2 - 50 : width2, 30, blocks, true));
             x += mathHelper.getRandomInt(width + 100, width + 200);
             x2 += mathHelper.getRandomInt(width2 + 100, width2 + 200);
         }
 
         for (int i = 0; i < players.length; i++) {
             final String s = players[i];
+            final int posX = mathHelper.getRandomInt(50, Game.GAME_DIMENSION.width - 50);
+            final int posY = 50;
             switch (s) {
-                case "Merkel" -> addObject(new MerkelPlayer(i));
-                case "Trump" -> addObject(new TrumpPlayer(i));
+                case "Merkel" -> addObject(new MerkelPlayer(i, posX, posY));
+                case "Trump" -> addObject(new TrumpPlayer(i, posX, posY));
             }
         }
 

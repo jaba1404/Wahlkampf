@@ -49,7 +49,6 @@ public class MainMenu extends MouseAdapter implements IMenu {
         quitButton.drawScreen(graphics, mouseX, mouseY);
         panel.drawScreen(graphics, mouseX, mouseY);
         renderer.textWithShadow(graphics, Game.GAME_TITLE, (int) ((Game.instance.getSize().width - titleFont.getStringSize(Game.GAME_TITLE).getWidth()) / 2), Game.instance.getSize().height / 2 - 120, new Color(230, 230, 230, 255), titleFont);
-        renderer.textWithShadow(graphics, Game.GAME_VERSION, (int) ((Game.instance.getSize().width - versionFont.getStringSize(Game.GAME_VERSION).getWidth()) / 2), Game.instance.getSize().height / 2 - 105, new Color(230, 230, 230, 255), versionFont);
     }
 
     @Override
